@@ -36,7 +36,7 @@
     }
 @endif
 
-.navbar-dark .navbar-nav .nav-link, .nav-tabs .nav-link {
+.navbar-dark .navbar-nav .nav-link {
     @if($navTextColor) color: {{ $navTextColor }} !important; @endif
 }
 
