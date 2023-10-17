@@ -103,8 +103,9 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="mb-0">
-                    @if($user) {!! $user->displayName !!}@endif
-                    @if($character) {!! $character->displayName !!} @endif
+                    @if($user) {!! $user->displayName !!}
+                    @elseif($character) {!! $character->displayName !!} 
+                    @endif
                     <button class="btn btn-link" data-toggle="collapse" data-target="#collapseUser_{{ $id }}" aria-expanded="true" aria-controls="collapseUser_{{ $id }}">
                      has received {{ $logs['total'] }} 
                     </button>
