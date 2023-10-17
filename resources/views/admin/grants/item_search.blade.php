@@ -7,7 +7,11 @@
 
 <h1>Item Search</h1>
 
-<p>Select an item to search for all occurrences of it in user and character inventories. It will only display currently extant stacks (where the count is more than zero). If a stack is currently "held" in a trade, design update, or submission, this will be stated and all held locations will be linked.</p>
+<p>Select an item to search for all occurrences of it in user and character inventories. If you select present, it will only display currently extant stacks (where the count is more than zero). 
+    If a stack is currently "held" in a trade, design update, or submission, this will be stated and all held locations will be linked.
+
+    If you select all time, it will check the item logs for how many of this item users ever originally received. This excludes item that were transferred to them!
+</p>
 
 {!! Form::open(['method' => 'GET', 'class' => '']) !!}
 <div class="form-inline justify-content-end">
@@ -15,12 +19,15 @@
         {!! Form::select('item_id', $items, Request::get('item_id'), ['class' => 'form-control selectize', 'placeholder' => 'Select an Item', 'style' => 'width: 25em; max-width: 100%;']) !!}
     </div>
     <div class="form-group ml-3 mb-3">
+        {!! Form::select('action', ['present' => 'Present', 'all' => 'All Time'], Request::get('action') ?? 'present', ['class' => 'form-control selectize', 'placeholder' => 'Present', 'style' => 'width: 25em; max-width: 100%;']) !!}
+    </div>
+    <div class="form-group ml-3 mb-3">
         {!! Form::submit('Search', ['class' => 'btn btn-primary']) !!}
     </div>
 </div>
 {!! Form::close() !!}
 
-@if($item)
+@if($item && $action == 'present')
     <h3>{{ $item->name }}</h3>
 
     <p>There are currently {{ $userItems->pluck('count')->sum()+$characterItems->pluck('count')->sum() }} of this item owned by users and characters.</p>
@@ -80,6 +87,55 @@
             </li>
         @endforeach
     </ul>
+@endif
+
+@if($item && $action == 'all')
+    <h3>{{ $item->name }}</h3>
+
+    <p>{{ $itemLogs->pluck('quantity')->sum() }} of this item were received by users and characters.</p>
+
+    <div id="userAccordion">
+        @foreach($itemLogsByAmount as $id=>$logs)
+        @php 
+        $user = App\Models\User\User::find($id);
+        $character = App\Models\Character\Character::find($id) 
+        @endphp
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    @if($user) {!! $user->displayName !!}@endif
+                    @if($character) {!! $character->displayName !!} @endif
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseUser_{{ $id }}" aria-expanded="true" aria-controls="collapseUser_{{ $id }}">
+                     has received {{ $logs['total'] }} 
+                    </button>
+                </h5>
+            </div>
+
+            <div id="collapseUser_{{ $id }}" class="collapse" data-parent="#userAccordion">
+                <div class="card-body">
+                    <table class="table table-sm">
+                    <thead>
+                        <tr>
+                        <th scope="col">Source</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Quantity</th>
+                        </tr>
+                    </thead>
+                    @foreach($logs['logs'] as $log)
+                    <tr>
+                        <td>{!! $log->log !!}</td>
+                        <td>{{ $log->created_at }}</td>
+                        <td>{{ $log->quantity }}</td>
+                    </tr>
+                    @endforeach
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+
 @endif
 
 <script>

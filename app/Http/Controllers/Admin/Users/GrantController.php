@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\User\User;
 use App\Models\Item\Item;
 use App\Models\Currency\Currency;
+use App\Models\Item\ItemLog;
 
 use App\Models\User\UserItem;
 use App\Models\Character\CharacterItem;
@@ -95,33 +96,54 @@ class GrantController extends Controller
      */
     public function getItemSearch(Request $request)
     {
+        $action = $request['action'];
         $item = Item::find($request->only(['item_id']))->first();
 
         if($item) {
-            // Gather all instances of this item
-            $userItems = UserItem::where('item_id', $item->id)->where('count', '>', 0)->get();
-            $characterItems = CharacterItem::where('item_id', $item->id)->where('count', '>', 0)->get();
+            if($action == 'present') {
+                // Gather all instances of this item
+                $userItems = UserItem::where('item_id', $item->id)->where('count', '>', 0)->get();
+                $characterItems = CharacterItem::where('item_id', $item->id)->where('count', '>', 0)->get();
 
-            // Gather the users and characters that own them
-            $users = User::whereIn('id', $userItems->pluck('user_id')->toArray())->orderBy('name', 'ASC')->get();
-            $characters = Character::whereIn('id', $characterItems->pluck('character_id')->toArray())->orderBy('slug', 'ASC')->get();
+                // Gather the users and characters that own them
+                $users = User::whereIn('id', $userItems->pluck('user_id')->toArray())->orderBy('name', 'ASC')->get();
+                $characters = Character::whereIn('id', $characterItems->pluck('character_id')->toArray())->orderBy('slug', 'ASC')->get();
 
-            // Gather hold locations
-            $designUpdates = CharacterDesignUpdate::whereIn('user_id', $userItems->pluck('user_id')->toArray())->whereNotNull('data')->get();
-            $trades = Trade::whereIn('sender_id', $userItems->pluck('user_id')->toArray())->orWhereIn('recipient_id', $userItems->pluck('user_id')->toArray())->get();
-            $submissions = Submission::whereIn('user_id', $userItems->pluck('user_id')->toArray())->whereNotNull('data')->get();
+                // Gather hold locations
+                $designUpdates = CharacterDesignUpdate::whereIn('user_id', $userItems->pluck('user_id')->toArray())->whereNotNull('data')->get();
+                $trades = Trade::whereIn('sender_id', $userItems->pluck('user_id')->toArray())->orWhereIn('recipient_id', $userItems->pluck('user_id')->toArray())->get();
+                $submissions = Submission::whereIn('user_id', $userItems->pluck('user_id')->toArray())->whereNotNull('data')->get();
+            } else {
+                $itemLogs = ItemLog::where('item_id', $item->id)->where('recipient_id', '!=', null)->where('log', 'not like', '%Transfer%')->get();
+                $itemLogsByAmount = [];
+                foreach($itemLogs->groupBy('recipient_id') as $id=>$logs){
+                    $itemLogsByAmount[$id] = ['total' => $logs->pluck('quantity')->sum(), 'logs' => $logs];
+                };
+
+                // Gather the users and characters that own them
+                $users = User::whereIn('id', $itemLogs->where('recipient_type', 'User')->pluck('recipient_id')->toArray())->orderBy('name', 'ASC')->get();
+                $characters = Character::whereIn('id', $itemLogs->where('recipient_type', 'Character')->pluck('recipient_id')->toArray())->orderBy('slug', 'ASC')->get();
+
+                uasort($itemLogsByAmount,function($first,$second){
+                    return $first['total'] < $second['total'];
+                });
+            }
+
         }
 
         return view('admin.grants.item_search', [
             'item' => $item ? $item : null,
             'items' => Item::orderBy('name')->pluck('name', 'id'),
-            'userItems' => $item ? $userItems : null,
-            'characterItems' => $item ? $characterItems : null,
-            'users' => $item ? $users : null,
-            'characters' => $item ? $characters : null,
-            'designUpdates' => $item ? $designUpdates :null,
-            'trades' => $item ? $trades : null,
-            'submissions' => $item ? $submissions : null,
+            'userItems' => $userItems ?? null,
+            'itemLogs' => $itemLogs ?? null,
+            'itemLogsByAmount' => $itemLogsByAmount ?? null,
+            'characterItems' => $characterItems ?? null,
+            'users' => $users ?? null,
+            'characters' => $characters ?? null,
+            'designUpdates' => $designUpdates ?? null,
+            'trades' => $trades ?? null,
+            'submissions' => $submissions ?? null,
+            'action' => $action
         ]);
     }
 
