@@ -114,7 +114,7 @@ class GrantController extends Controller
                 $trades = Trade::whereIn('sender_id', $userItems->pluck('user_id')->toArray())->orWhereIn('recipient_id', $userItems->pluck('user_id')->toArray())->get();
                 $submissions = Submission::whereIn('user_id', $userItems->pluck('user_id')->toArray())->whereNotNull('data')->get();
             } else {
-                $itemLogs = ItemLog::where('item_id', $item->id)->where('recipient_id', '!=', null)->where('log', 'not like', '%Transfer%')->get();
+                $itemLogs = ItemLog::where('item_id', $item->id)->where('recipient_id', '!=', null)->where('log', 'not like', '%Transfer%')->where('log', 'not like', '%Trade%')->get();
                 $itemLogsByAmount = [];
                 foreach($itemLogs->groupBy('recipient_id') as $id=>$logs){
                     $itemLogsByAmount[$id] = ['total' => $logs->pluck('quantity')->sum(), 'logs' => $logs];
