@@ -1,6 +1,9 @@
 <div class="character-masterlist-categories">
     @if(!$character->is_myo_slot)
         {!! $character->category->displayName !!} ・ {!! $character->image->species->displayName !!} ・ {!! $character->image->rarity->displayName !!}
+        @if(Settings::get('character_title_display') && $character->image->hasTitle)
+            ・ "{!! $character->image->title_id ? $character->image->title->displayName : nl2br(htmlentities($character->image->title_data['full'])) !!}"
+        @endif
     @else
         MYO Slot @if($character->image->species_id) ・ {!! $character->image->species->displayName !!}@endif @if($character->image->rarity_id) ・ {!! $character->image->rarity->displayName !!}@endif
     @endif

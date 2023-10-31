@@ -47,6 +47,24 @@
             }
         }
 
+        var $customTitle = $('#customTitle');
+        var $customTitleOptions = $('#customTitleOptions');
+
+        var customTitleSearch = $customTitle.val() == 'custom';
+
+        updateTitleSearch();
+
+        $customTitle.on('change', function(e) {
+            customTitleSearch = $customTitle.val() == 'custom';
+
+            updateTitleSearch();
+        });
+
+        function updateTitleSearch() {
+            if(customTitleSearch) $customTitleOptions.removeClass('hide');
+            else $customTitleOptions.addClass('hide');
+        }
+
         var $featureBody = $('#featureBody');
         var $featureSelect = $('#featureContent .feature-block');
         var $addFeatureButton = $('.add-feature-button');

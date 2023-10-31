@@ -225,6 +225,28 @@
         {!! Form::select('rarity_id', $rarities, old('rarity_id'), ['class' => 'form-control']) !!}
     </div>
 
+    @if(!$isMyo)
+    <div class="row no-gutters">
+        <div class="col-md-6 pr-2">
+            <div class="form-group">
+                {!! Form::label('Character Title') !!}
+                {!! Form::select('title_id', $titles, old('title_id'), ['class' => 'form-control', 'id' => 'charTitle']) !!}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group" id="titleOptions">
+                {!! Form::label('Extra Info/Custom Title (Optional)') !!} {!! add_help('If \'custom title\' is selected, this will be displayed as the title. If a preexisting title is selected, it will be displayed in addition to it. The short version is only used in the case of a custom title.') !!}
+                <div class="d-flex">
+                    {!! Form::text('title_data[full]', null, ['class' => 'form-control mr-2', 'placeholder' => 'Full Title']) !!}
+                    @if(Settings::get('character_title_display'))
+                        {!! Form::text('title_data[short]', null, ['class' => 'form-control mr-2', 'placeholder' => 'Short Title (Optional)']) !!}
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="form-group">
         {!! Form::label('Traits') !!} @if($isMyo) {!! add_help('These traits will be listed as required traits for the slot. The user will still be able to add on more traits, but not be able to remove these. This is allowed to conflict with the rarity above; you may add traits above the character\'s specified rarity.') !!} @endif
         <div id="featureList">

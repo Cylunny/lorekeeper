@@ -19,7 +19,7 @@ class CharacterImage extends Model
      * @var array
      */
     protected $fillable = [
-        'character_id', 'user_id', 'species_id', 'subtype_id', 'rarity_id', 'url',
+        'character_id', 'user_id', 'species_id', 'subtype_id', 'rarity_id', 'url', 'title_id', 'title_data',
         'extension', 'use_cropper', 'hash', 'fullsize_hash', 'sort',
         'x0', 'x1', 'y0', 'y1',
         'description', 'parsed_description',
@@ -109,6 +109,14 @@ class CharacterImage extends Model
     public function rarity()
     {
         return $this->belongsTo('App\Models\Rarity', 'rarity_id');
+    }
+
+    /**
+     * Get the title of the character image.
+     */
+    public function title()
+    {
+        return $this->belongsTo('App\Models\Character\CharacterTitle', 'title_id');
     }
 
     /**
@@ -272,5 +280,26 @@ class CharacterImage extends Model
     public function getThumbnailUrlAttribute()
     {
         return asset($this->imageDirectory . '/' . $this->thumbnailFileName);
+    }
+
+    /**
+     * Checks if the image has title info associated with it.
+     *
+     * @return string
+     */
+    public function getHasTitleAttribute()
+    {
+       if(isset($this->title_id) || isset($this->title_data)) return true;
+        else return false;
+    }
+
+    /**
+     * Get the title data attribute as an associative array.
+     *
+     * @return array
+     */
+    public function getTitleDataAttribute()
+    {
+        return json_decode($this->attributes['title_data'], true);
     }
 }

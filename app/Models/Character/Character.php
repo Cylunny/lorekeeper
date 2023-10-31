@@ -4,6 +4,7 @@ namespace App\Models\Character;
 
 use Config;
 use DB;
+use Settings;
 use Carbon\Carbon;
 use Notifications;
 use App\Models\Model;

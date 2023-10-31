@@ -103,6 +103,19 @@ class AddSiteSettings extends Command
 
         $this->addSiteSetting('group_currency', 1, 'ID of the group currency to award from gallery submissions (if enabled).');
 
+        if(!DB::table('site_settings')->where('key', 'character_title_display')->exists()) {
+            DB::table('site_settings')->insert([
+                [
+                    'key' => 'character_title_display',
+                    'value' => 0,
+                    'description' => '0: Characters\' titles only display in their image info. 1: Characters\'s titles display alongside their category, species, rarity.'
+                ]
+
+            ]);
+            $this->info("Added:   character_title_display / Default: 0");
+        }
+        else $this->line("Skipped: character_title_display");
+
         $this->line("\nSite settings up to date!");
 
     }

@@ -24,8 +24,8 @@ class CharacterDesignUpdate extends Model
         'use_cropper', 'x0', 'x1', 'y0', 'y1',
         'hash', 'species_id', 'subtype_id', 'rarity_id',
         'has_comments', 'has_image', 'has_addons', 'has_features',
-        'submitted_at', 'update_type', 'fullsize_hash', 
-        'approval_votes', 'rejection_votes'
+        'submitted_at', 'update_type', 'fullsize_hash',
+        'approval_votes', 'rejection_votes', 'title_id', 'title_data'
     ];
 
     /**
@@ -113,6 +113,14 @@ class CharacterDesignUpdate extends Model
     public function rarity()
     {
         return $this->belongsTo('App\Models\Rarity', 'rarity_id');
+    }
+
+    /**
+     * Get the title of the design update.
+     */
+    public function title()
+    {
+        return $this->belongsTo('App\Models\Character\CharacterTitle', 'title_id');
     }
 
     /**
@@ -337,6 +345,16 @@ class CharacterDesignUpdate extends Model
     public function getVoteDataAttribute()
     {
         return collect(json_decode($this->attributes['vote_data'], true));
+    }
+
+    /**
+     * Get the title data attribute as an associative array.
+     *
+     * @return array
+     */
+    public function getTitleDataAttribute()
+    {
+        return json_decode($this->attributes['title_data'], true);
     }
 
     /**********************************************************************************************
