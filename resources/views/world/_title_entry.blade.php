@@ -10,6 +10,16 @@
         </div>
 
         </h3>
+        @if($title->item && !$title->is_user_selectable)
+        <div>
+            <b>Unlocked by:</b> {!! $title->item->displayName !!}
+        </div>
+        @endif
+        @if($title->is_user_selectable)
+        <div>
+            <b>Unlocked by:</b> This title is free!
+        </div>
+        @endif
         <div class="world-entry-text">
             {!! $description !!}
         </div>

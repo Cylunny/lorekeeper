@@ -67,7 +67,7 @@ function calculateGroupCurrency($data)
  */
 function getAssetKeys($isCharacter = false)
 {
-    if(!$isCharacter) return ['items', 'currencies', 'raffle_tickets', 'loot_tables', 'user_items', 'characters'];
+    if(!$isCharacter) return ['items', 'currencies', 'raffle_tickets', 'loot_tables', 'user_items', 'characters', 'titles'];
     else return ['currencies', 'items', 'character_items', 'loot_tables'];
 }
 
@@ -116,6 +116,11 @@ function getAssetModelString($type, $namespaced = true)
         case 'character_items':
             if($namespaced) return '\App\Models\Character\CharacterItem';
             else return 'CharacterItem';
+            break;
+            
+        case 'titles':
+            if ($namespaced) return '\App\Models\Character\CharacterTitle';
+            else return 'CharacterTitle';
             break;
     }
     return null;
@@ -272,6 +277,11 @@ function fillUserAssets($assets, $sender, $recipient, $logType, $data)
             $service = new \App\Services\CharacterManager;
             foreach($contents as $asset)
                 if(!$service->moveCharacter($asset['asset'], $recipient, $data, $asset['quantity'], $logType)) return false;
+        }
+        else if ($key == 'titles' && count($contents)) {
+            $service = new \App\Services\CharacterTitleManager;
+            foreach ($contents as $asset)
+                if (!$service->creditTitle($recipient, $asset['asset'])) return false;
         }
     }
     return $assets;

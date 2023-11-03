@@ -11,6 +11,7 @@ use Carbon\Carbon;
 
 use App\Models\Character\Character;
 use App\Models\Character\CharacterImageCreator;
+use App\Models\Character\CharacterTitle;
 use App\Models\Rank\RankPower;
 use App\Models\Currency\Currency;
 use App\Models\Currency\CurrencyLog;
@@ -187,6 +188,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function bookmarks() 
     {
         return $this->hasMany('App\Models\Character\CharacterBookmark')->where('user_id', $this->id);
+    }
+
+
+    /**
+     * Get user's unlocked titles.
+     */
+    public function titles() {
+        return $this->belongsToMany('App\Models\Character\CharacterTitle', 'user_titles', 'user_id', 'title_id')->withPivot('id');
     }
 
     /**********************************************************************************************
@@ -564,5 +573,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function hasBookmarked($character)
     {
         return CharacterBookmark::where('user_id', $this->id)->where('character_id', $character->id)->first();
+    }
+
+    /**
+     * Checks if the user has the title unlocked.
+     *
+     * @return bool
+     */
+    public function hasTitle($title_id) {
+        $title = CharacterTitle::find($title_id);
+        $user_has = $this->titles && $this->titles->contains($title);
+        $default = $title->is_user_selectable;
+        return $default ? true : $user_has;
     }
 }

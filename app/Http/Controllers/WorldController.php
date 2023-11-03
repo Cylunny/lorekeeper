@@ -329,7 +329,7 @@ class WorldController extends Controller
      */
     public function getCharacterTitles(Request $request)
     {
-        $query = CharacterTitle::query();
+        $query = CharacterTitle::query()->where('is_active', 1);
         $title = $request->get('title');
         $rarity = $request->get('rarity_id');
         if($title) $query->where('title', 'LIKE', '%'.$title.'%');

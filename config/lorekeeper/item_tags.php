@@ -24,4 +24,9 @@ return [
         'text_color' => '#ffffff',
         'background_color' => '#1fd1a7'
     ],
+    'title' => [
+        'name' => 'Title',
+        'text_color' => '#ffffff',
+        'background_color' => '#b26ae2'
+    ],
 ];

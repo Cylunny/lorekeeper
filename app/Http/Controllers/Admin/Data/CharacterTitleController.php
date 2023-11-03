@@ -7,6 +7,7 @@ use Auth;
 
 use App\Models\Character\CharacterTitle;
 use App\Models\Rarity;
+use App\Models\Item\Item;
 
 use App\Services\CharacterTitleService;
 
@@ -44,7 +45,8 @@ class CharacterTitleController extends Controller
     {
         return view('admin.character_titles.create_edit_title', [
             'title' => new CharacterTitle,
-            'rarities' => Rarity::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray()
+            'rarities' => Rarity::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray(),
+            'items' => ['none' => 'No item'] + Item::all()->pluck('name', 'id')->toArray(),
         ]);
     }
 
@@ -60,7 +62,8 @@ class CharacterTitleController extends Controller
         if(!$title) abort(404);
         return view('admin.character_titles.create_edit_title', [
             'title' => $title,
-            'rarities' => Rarity::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray()
+            'rarities' => Rarity::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray(),
+            'items' => ['none' => 'No item'] + Item::all()->pluck('name', 'id')->toArray(),
         ]);
     }
 
@@ -76,7 +79,7 @@ class CharacterTitleController extends Controller
     {
         $id ? $request->validate(CharacterTitle::$updateRules) : $request->validate(CharacterTitle::$createRules);
         $data = $request->only([
-            'title', 'short_title', 'rarity_id', 'description', 'image', 'remove_image'
+            'title', 'short_title', 'rarity_id', 'description', 'image', 'remove_image', 'is_active', 'is_user_selectable', 'item_id'
         ]);
         if($id && $service->updateTitle(CharacterTitle::find($id), $data, Auth::user())) {
             flash('Title updated successfully.')->success();

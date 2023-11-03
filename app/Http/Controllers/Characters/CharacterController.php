@@ -34,6 +34,7 @@ use App\Services\InventoryManager;
 use App\Services\CharacterManager;
 
 use App\Http\Controllers\Controller;
+use App\Models\Character\CharacterTitle;
 
 class CharacterController extends Controller
 {
@@ -105,8 +106,12 @@ class CharacterController extends Controller
         $isOwner = ($this->character->user_id == Auth::user()->id);
         if(!$isMod && !$isOwner) abort(404);
 
+        //get character titles that are freely available
+        $freeTitles = CharacterTitle::where('is_active',1)->where('is_user_selectable',1)->get()->pluck('title', 'id')->toArray();
+
         return view('character.edit_profile', [
             'character' => $this->character,
+            'titles' => $freeTitles + Auth::user()->titles()->where('is_active', 1)->get()->pluck('title', 'id')->toArray(),
         ]);
     }
 
@@ -128,7 +133,7 @@ class CharacterController extends Controller
 
         $request->validate(CharacterProfile::$rules);
 
-        if($service->updateCharacterProfile($request->only(['name', 'link', 'text', 'is_gift_art_allowed', 'is_gift_writing_allowed', 'is_trading', 'alert_user']), $this->character, Auth::user(), !$isOwner)) {
+        if($service->updateCharacterProfile($request->only(['name', 'link', 'text', 'is_gift_art_allowed', 'is_gift_writing_allowed', 'is_trading', 'alert_user', 'title_id']), $this->character, Auth::user(), !$isOwner)) {
             flash('Profile edited successfully.')->success();
         }
         else {

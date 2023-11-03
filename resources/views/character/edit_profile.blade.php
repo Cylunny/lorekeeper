@@ -31,6 +31,12 @@
             {!! Form::text('link', $character->profile->link, ['class' => 'form-control']) !!}
         </div>
     @endif
+    {!! Form::label('title', 'Title') !!} {!! add_help('Select a title from the available ones below! You can unlock more titles via items.') !!}
+    <div class="row">
+        <div class="col-md form-group">
+            {!! Form::select('title_id', [0 => 'Choose a Title' ] + $titles, $character->image->title_id ?? 0, ['class' => 'form-control selectize']) !!}
+        </div>
+    </div>
 @endif
 <div class="form-group">
     {!! Form::label('text', 'Profile Content') !!}

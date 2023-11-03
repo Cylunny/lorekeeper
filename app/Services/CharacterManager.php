@@ -1281,6 +1281,12 @@ class CharacterManager extends Service
                 $character->save();
             }
 
+            //update title which is saved in character image
+            if(isset($data['title_id']) && $data['title_id'] > 0) $character->image->title_id = $data['title_id'];
+            else $character->image->title_id = null;
+            $character->image->save();
+
+
             // Update the character's profile
             if(!$character->is_myo_slot) $character->name = $data['name'];
             $character->save();

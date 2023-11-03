@@ -13,7 +13,7 @@ class CharacterTitle extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'short_title', 'sort', 'has_image', 'description', 'parsed_description', 'rarity_id'
+        'title', 'short_title', 'sort', 'has_image', 'description', 'parsed_description', 'rarity_id', 'is_active', 'is_user_selectable', 'item_id'
     ];
 
     /**
@@ -59,6 +59,22 @@ class CharacterTitle extends Model
     public function rarity()
     {
         return $this->belongsTo('App\Models\Rarity', 'rarity_id');
+    }
+
+    /**
+     * Get the related usertitle entries.
+     */
+    public function usertitles()
+    {
+        return $this->hasMany('App\Models\User\UserTitle', 'title_id');
+    }
+
+    /**
+     * Get the item the title belongs to (if present).
+     */
+    public function item()
+    {
+        return $this->belongsTo('App\Models\Item\Item');
     }
 
     /**********************************************************************************************
@@ -166,5 +182,14 @@ class CharacterTitle extends Model
     public function getSearchCharactersUrlAttribute()
     {
         return url('masterlist?title_id='.$this->id);
+    }
+
+    /**
+     * Gets the titles's asset type for asset management.
+     *
+     * @return string
+     */
+    public function getAssetTypeAttribute() {
+        return 'titles';
     }
 }

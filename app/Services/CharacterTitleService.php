@@ -112,6 +112,9 @@ class CharacterTitleService extends Service
             }
             unset($data['remove_image']);
         }
+        if(!isset($data['is_active'])) $data['is_active'] = 0;
+        if(!isset($data['is_user_selectable'])) $data['is_user_selectable'] = 0;
+        if(isset($data['item_id']) && $data['item_id'] == 'none') $data['item_id'] = null;
 
         return $data;
     }
@@ -129,6 +132,9 @@ class CharacterTitleService extends Service
         try {
             // Check first if characters with this title exist
             if(CharacterImage::where('title_id', $title->id)->exists() || Character::where('title_id', $title->id)->exists()) throw new \Exception("A character or character image with this title exists. Please change its title first.");
+
+            // if the title should be deleted also delete the corresponding usertitles
+            if($title->usertitles->count() > 0) $title->usertitles->delete();
 
             if($title->has_image) $this->deleteImage($title->titleImagePath, $title->titleImageFileName);
             $title->delete();
