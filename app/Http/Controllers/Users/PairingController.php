@@ -47,22 +47,18 @@ class PairingController extends Controller
 
         if($type == 'closed') $pairings = Pairing::where('user_id', $user->id)->whereIn('status', ['REJECTED', 'USED'])->orderBy('id', 'DESC')->get()->paginate(10)->appends($request->query());
 
-        $userItems = $user->items()->where('count', ">", 0)->get();
-        $pairingItemIds = [];
-        foreach($userItems as $item){
-            if($item->tags()->where('tag', 'pairing')->exists()) $pairingItemIds[] = $item->id;
-        }
-
-        $boostItemIds = [];
-        foreach($userItems as $item){
-            if($item->tags()->where('tag', 'boost')->exists()) $boostItemIds[] = $item->id;
-        }
+        $inventory = UserItem::with('item')->whereNull('deleted_at')->where('count', '>', '0')->where('user_id', $user->id)
+        ->get()
+        ->filter(function($userItem){
+            return $userItem->item->tags()->where('tag', 'pairing')->exists() || $userItem->item->tags()->where('tag', 'boost')->exists();
+        })
+        ->sortBy('item.name');
 
         return view('home.pairings', [
             'pairings' => $pairings,
             'sublists' => Sublist::orderBy('sort', 'DESC')->get(),
-            'item_filter' => Item::whereIn('id', $boostItemIds)->orWhereIn('id', $pairingItemIds)->orderBy('name')->released()->get()->keyBy('id'),
-            'inventory' => UserItem::with('item')->where('user_id', $user->id)->whereIn('item_id', $boostItemIds)->orWhereIn('item_id', $pairingItemIds)->get(),
+            'item_filter' => Item::whereIn('id', $inventory->pluck('item_id'))->orderBy('name')->released()->get()->keyBy('id'),
+            'inventory' => $inventory,
             'categories' => ItemCategory::orderBy('sort', 'DESC')->get(),
             'page' => 'pairing',
         ]);
