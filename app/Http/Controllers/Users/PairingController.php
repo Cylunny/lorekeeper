@@ -62,7 +62,7 @@ class PairingController extends Controller
             'pairings' => $pairings,
             'sublists' => Sublist::orderBy('sort', 'DESC')->get(),
             'item_filter' => Item::whereIn('id', $boostItemIds)->orWhereIn('id', $pairingItemIds)->orderBy('name')->released()->get()->keyBy('id'),
-            'inventory' => UserItem::with('item')->whereIn('item_id', $boostItemIds)->orWhereIn('item_id', $pairingItemIds)->get(),
+            'inventory' => UserItem::with('item')->where('user_id', $user->id)->whereIn('item_id', $boostItemIds)->orWhereIn('item_id', $pairingItemIds)->get(),
             'categories' => ItemCategory::orderBy('sort', 'DESC')->get(),
             'page' => 'pairing',
         ]);
