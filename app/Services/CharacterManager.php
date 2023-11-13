@@ -1739,6 +1739,12 @@ class CharacterManager extends Service
                 'text'        => null,
                 'parsed_text' => null
             ]);
+
+            // Reset title
+            $character->image->update([
+                'title_id' => null,
+                'title_data' => null
+            ]);
         }
 
         // Add a log for the ownership change
