@@ -73,12 +73,12 @@ class PairingManager extends Service
                 $pairingsCharacter1 = Pairing::where(function($query) use ($character1){
                     $query->where('character_1_id', $character1->id)
                     ->orWhere('character_2_id', $character1->id);
-                })->whereIn('status', ['READY', 'OPEN'])->where( 'created_at', '>', Carbon::now()->subDays($cooldownDays))->get();
+                })->whereIn('status', ['READY', 'OPEN', 'USED'])->where( 'created_at', '>', Carbon::now()->subDays($cooldownDays))->get();
                 if(!$pairingsCharacter1->isEmpty()) throw new \Exception("Character 1 cannot be paired right now due to the pairing cooldown of ".$cooldownDays." days!");
                 $pairingsCharacter2 = Pairing::where(function($query)use ($character2){
                     $query->where('character_1_id', $character2->id)
                     ->orWhere('character_2_id', $character2->id);
-                })->whereIn('status', ['READY', 'OPEN'])->where( 'created_at', '>', Carbon::now()->subDays($cooldownDays))->get();
+                })->whereIn('status', ['READY', 'OPEN', 'USED'])->where( 'created_at', '>', Carbon::now()->subDays($cooldownDays))->get();
                 if(!$pairingsCharacter2->isEmpty()) throw new \Exception("Character 2 cannot be paired right now due to the pairing cooldown of ".$cooldownDays." days!");
             }
 
