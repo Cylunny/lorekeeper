@@ -8,7 +8,7 @@
 <h1>Raffle Index</h1>
 <div class="text-right form-group">
     <a class="btn btn-success edit-group" href="#" data-id="">Create Raffle Group</a>
-    <a class="btn btn-success edit-raffle" href="#" data-id="">Create Raffle</a>
+    <a class="btn btn-success edit-raffle" href="{{ url('/admin/raffles/edit/raffle/') }}" data-id="">Create Raffle</a>
 </div>
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item"><a href="{{ url()->current() }}" class="nav-link {{ Request::get('is_active') ? '' : 'active' }}">Current Raffles</a></li>
@@ -59,7 +59,7 @@
                 @if(!$raffle->group_id)
                     <a href="#" class="roll-raffle btn btn-outline-danger btn-xs p-2" data-id="{{ $raffle->id }}">Roll Raffle</a>
                 @endif
-                <a href="#" class="edit-raffle btn btn-xs btn-outline-primary p-2" data-id="{{ $raffle->id }}">
+                <a href="{{ url('/admin/raffles/edit/raffle/'.$raffle->id) }}" class="edit-raffle btn btn-xs btn-outline-primary p-2" data-id="{{ $raffle->id }}">
                     Edit Raffle
                 </a>
             </div>
@@ -75,10 +75,6 @@
     $('.edit-group').on('click', function(e) {
         e.preventDefault();
         loadModal("{{ url('/admin/raffles/edit/group/') }}/" + $(this).data('id'), 'Edit Raffle Group');
-    });
-    $('.edit-raffle').on('click', function(e) {
-        e.preventDefault();
-        loadModal("{{ url('/admin/raffles/edit/raffle/') }}/" + $(this).data('id'), 'Edit Raffle');
     });
     $('.roll-raffle').on('click', function(e) {
         e.preventDefault();

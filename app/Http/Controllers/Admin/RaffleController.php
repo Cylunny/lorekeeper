@@ -54,7 +54,7 @@ class RaffleController extends Controller
             if (!$raffle) abort(404);
         }
         else $raffle = new Raffle;
-        return view('admin.raffle._raffle_create_edit', [
+        return view('admin.raffle.create_edit_raffle', [
             'raffle' => $raffle,
             'groups' => [0 => 'No group'] + RaffleGroup::where('is_active', '<', 2)->pluck('name', 'id')->toArray(),
             'items' => Item::orderBy('name')->pluck('name', 'id'),
@@ -81,7 +81,7 @@ class RaffleController extends Controller
         else if ($id) $raffle = $service->updateRaffle($data, Raffle::find($id));
         if ($raffle) {
             flash('Raffle ' . ($id ? 'updated' : 'created') . ' successfully!')->success();
-            return redirect()->back();
+            return redirect()->to('admin/raffles/edit/raffle/'.$raffle->id);
         }
         else {
             flash('Couldn\'t create raffle.')->error();
@@ -260,5 +260,39 @@ class RaffleController extends Controller
             flash('Error in rolling winners.')->error();
             return redirect()->back()->withInput();  
         }
+    }
+
+        
+    /**
+     * Gets the raffle deletion modal.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getDeleteRaffle($id)
+    {
+        $raffle = Raffle::find($id);
+        return view('admin.raffle._delete_raffle', [
+            'raffle' => $raffle,
+        ]);
+    }
+
+    /**
+     * Deletes a raffle.
+     *
+     * @param  \Illuminate\Http\Request     $request
+     * @param  App\Services\RaffleService  $service
+     * @param  int                          $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function postDeleteRaffle(Request $request, RaffleService $service, $id)
+    {
+        if($id && $service->deleteRaffle(Raffle::find($id))) {
+            flash('Raffle deleted successfully.')->success();
+        }
+        else {
+            foreach($service->errors()->getMessages()['error'] as $error) flash($error)->error();
+        }
+        return redirect()->to('admin/raffles');
     }
 }

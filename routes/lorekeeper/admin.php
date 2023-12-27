@@ -395,6 +395,9 @@ Route::group(['prefix' => 'raffles', 'middleware' => 'power:manage_raffles'], fu
     Route::post('roll/raffle/{id}', 'RaffleController@postRollRaffle');
     Route::get('roll/group/{id}', 'RaffleController@getRollRaffleGroup');
     Route::post('roll/group/{id}', 'RaffleController@postRollRaffleGroup');
+
+    Route::get('delete/{id}', 'RaffleController@getDeleteRaffle');
+    Route::post('delete/{id}', 'RaffleController@postDeleteRaffle');
 });
 
 # SUBMISSIONS

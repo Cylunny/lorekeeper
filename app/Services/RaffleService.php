@@ -66,7 +66,8 @@ class RaffleService  extends Service
     public function deleteRaffle($raffle) 
     {
         DB::beginTransaction();
-        foreach($raffle->tickets as $ticket) $ticket->delete();
+        $raffle->tickets()->delete();
+        $raffle->rewards()->delete();
         $raffle->delete();
         DB::commit();
         return true;
