@@ -3,8 +3,7 @@
 @section('admin-title') Raffle Index @endsection
 
 @section('admin-content')
-{!! breadcrumbs(['Admin Panel' => 'admin', 'Raffle Index' => 'admin/raffles']) !!}
-
+{!! breadcrumbs(['Admin Panel' => 'admin', 'Raffle Index' => 'admin/raffles',  $raffle->id ? 'Edit' : 'Create' => '']) !!}
 
 <h1>{{ $raffle->id ? 'Edit' : 'Create' }} Raffle
     @if($raffle->id)
