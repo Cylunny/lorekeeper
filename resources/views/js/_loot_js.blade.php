@@ -11,6 +11,7 @@ $( document ).ready(function() {
     @if($showRaffles)
         var $raffleSelect = $('#lootRowData').find('.raffle-select');
     @endif
+    var $characterSelect = $('#lootRowData').find('.character-select');
 
     $('#lootTableBody .selectize').selectize();
     attachRemoveListener($('#lootTableBody .remove-loot-button'));
@@ -36,6 +37,7 @@ $( document ).ready(function() {
         @if($showRaffles)
             else if (val == 'Raffle') $clone = $raffleSelect.clone();
         @endif
+        else if (val == 'Character') $clone = $characterSelect.clone();
 
         $cell.html('');
         $cell.append($clone);
@@ -55,6 +57,7 @@ $( document ).ready(function() {
             @if($showRaffles)
                 else if (val == 'Raffle') $clone = $raffleSelect.clone();
             @endif
+            else if (val == 'Character') $clone = $characterSelect.clone();
 
             $cell.html('');
             $cell.append($clone);

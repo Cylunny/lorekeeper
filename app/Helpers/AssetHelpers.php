@@ -271,7 +271,7 @@ function fillUserAssets($assets, $sender, $recipient, $logType, $data)
         {
             $service = new \App\Services\CharacterManager;
             foreach($contents as $asset)
-                if(!$service->moveCharacter($asset['asset'], $recipient, $data, $asset['quantity'], $logType)) return false;
+                $service->moveCharacter($asset['asset'], $recipient, $data['data'], $asset['quantity'], $logType);
         }
     }
     return $assets;

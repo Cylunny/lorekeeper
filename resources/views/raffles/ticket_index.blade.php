@@ -5,6 +5,8 @@
 @section('content')
 {!! breadcrumbs(['Raffles' => 'raffles', 'Raffle: ' . $raffle->name => 'raffles/view/'.$raffle->id]) !!}
 <h1>Raffle: {{ $raffle->name }}</h1>
+
+                
 @if($raffle->is_active == 1)
     <div class="alert alert-success">This raffle is currently open. (Number of winners to be drawn: {{ $raffle->winner_count }})</div>
 @elseif($raffle->is_active == 2)
@@ -26,6 +28,25 @@
         </div>
     </div>
 @endif
+
+@if($raffle->parsed_description || $raffle->rewards->count() >= 1)
+  @if($raffle->parsed_description)
+    {!! $raffle->parsed_description !!} 
+    <hr>
+  @endif
+  @if($raffle->rewards->count() >= 1)
+    A total of {{ $raffle->winner_count}} winner(s) will receive the following rewards:
+    <div class="row justify-content-center">
+      @foreach($raffle->rewards as $reward)
+        <div class="col-lg-4 col-12 mt-3">
+          @if($reward->rewardImage)<div class="row justify-content-center"><img class="border rounded" src="{{ $reward->rewardImage }}" alt="{{ $reward->reward()->first()->name }}" style="max-width:100%;" /></div>@endif
+          <div class="row justify-content-center"><span class="mr-1">{{ $reward->quantity }}</span> {!! $reward->reward()->first()->displayName !!}</div>
+        </div>
+      @endforeach
+    </div>
+  @endif
+@endif
+
 <h3>Tickets</h3>
 
 @if(Auth::check() && count($tickets))

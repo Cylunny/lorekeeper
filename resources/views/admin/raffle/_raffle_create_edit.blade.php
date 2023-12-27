@@ -9,6 +9,10 @@
         {!! Form::text('name', $raffle->name, ['class' => 'form-control']) !!}
     </div>
     <div class="form-group">
+    {!! Form::label('Description (Optional)') !!} {!! add_help('This is a full description of the raffle that shows up on the raffle page.') !!}
+    {!! Form::textarea('description', $raffle->description, ['class' => 'form-control wysiwyg']) !!}
+    </div>
+    <div class="form-group">
         {!! Form::label('winner_count', 'Number of Winners to Draw') !!}
         {!! Form::text('winner_count', $raffle->winner_count, ['class' => 'form-control']) !!}
     </div>
@@ -20,13 +24,29 @@
         {!! Form::label('order', 'Raffle Order') !!} {!! add_help('Enter a number. If a group of raffles is rolled, raffles will be drawn in ascending order.') !!}
         {!! Form::text('order', $raffle->order ? : 0, ['class' => 'form-control']) !!}
     </div>
-    <div class="form-group">
-        <label class="control-label">
+    <div class="form-group row">
+        <label class="control-label col-6">
             {!! Form::checkbox('is_active', 1, $raffle->is_active, ['class' => 'form-check-input mr-2', 'data-toggle' => 'toggle']) !!}
             {!! Form::label('is_displayed', 'Active (visible to users)', ['class' => 'form-check-label ml-3']) !!}
         </label>
+        <label class="control-label col-6">
+            {!! Form::checkbox('has_join_button', 1, $raffle->has_join_button, ['class' => 'form-check-input mr-2', 'data-toggle' => 'toggle']) !!} 
+            {!! Form::label('has_join_button', 'Add join button', ['class' => 'form-check-label ml-3']) !!} {!! add_help('Adds a button that automatically grants each user a ticket to this raffle once.') !!}
+        </label>
     </div>
+    <h3>Rewards (Optional)</h3>
+    <p>Rewards are credited to the user that is rolled as the winner of the raffle.</p>
+    <p>You can add loot tables containing any kind of currencies (both user- and character-attached), but be sure to keep track of which are being distributed! Character-only currencies cannot be given to users.</p>
+    @include('widgets._loot_select', ['loots' => $raffle->rewards, 'showLootTables' => true, 'showRaffles' => true])
+
     <div class="text-right">
         {!! Form::submit('Confirm', ['class' => 'btn btn-primary']) !!}
     </div>
+    {!! Form::close() !!}
+
+    @include('widgets._loot_select_row', ['items' => $items, 'currencies' => $currencies, 'tables' => $tables, 'raffles' => $raffles, 'showLootTables' => true, 'showRaffles' => true])
+
+
 {!! Form::close() !!}
+
+@include('js._loot_js', ['showLootTables' => true, 'showRaffles' => true])

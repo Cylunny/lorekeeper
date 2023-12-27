@@ -198,3 +198,10 @@ Route::group(['prefix' => 'comments', 'namespace' => 'Comments'], function() {
     Route::post('/{comment}', 'CommentController@reply')->name('comments.reply');
     Route::post('/{id}/feature', 'CommentController@feature')->name('comments.feature');
 });
+
+/**************************************************************************************************
+    Raffles
+**************************************************************************************************/
+Route::group(['prefix' => 'raffles'], function () {
+    Route::get('join/{id}', 'RaffleController@getJoinRaffle');
+});

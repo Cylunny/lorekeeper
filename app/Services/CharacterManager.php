@@ -1454,7 +1454,6 @@ class CharacterManager extends Service
             $sender = $character->user;
 
             $this->moveCharacter($character, $recipient, 'Transferred by ' . $user->displayName . (isset($data['reason']) ? ': ' . $data['reason'] : ''), isset($data['cooldown']) ? $data['cooldown'] : -1);
-
             // Add notifications for the old and new owners
             if($sender) {
                 Notifications::create('CHARACTER_SENT', $sender, [
@@ -1728,7 +1727,6 @@ class CharacterManager extends Service
                 'parsed_text' => null
             ]);
         }
-
         // Add a log for the ownership change
         $this->createLog(
 is_object($sender) ? $sender->id : null,
@@ -1736,6 +1734,7 @@ is_object($sender) ? $sender->id : null,
             $recipient && is_object($recipient) ? $recipient->id : null,
             $recipient && is_object($recipient) ? $recipient->url : ($recipient ? : null),
             $character->id, $logType ? $logType : ($character->is_myo_slot ? 'MYO Slot Transferred' : 'Character Transferred'), $data, 'user');
+
     }
 
     /**

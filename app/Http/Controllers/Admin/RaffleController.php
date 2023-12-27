@@ -9,7 +9,10 @@ use Illuminate\Http\Request;
 use App\Models\Raffle\RaffleGroup;
 use App\Models\Raffle\Raffle;
 use App\Models\Raffle\RaffleTicket;
-
+use App\Models\Item\Item;
+use App\Models\Currency\Currency;
+use App\Models\Loot\LootTable;
+use App\Models\Character\Character;
 use App\Models\User\User;
 use App\Services\RaffleService;
 use App\Services\RaffleManager;
@@ -54,6 +57,11 @@ class RaffleController extends Controller
         return view('admin.raffle._raffle_create_edit', [
             'raffle' => $raffle,
             'groups' => [0 => 'No group'] + RaffleGroup::where('is_active', '<', 2)->pluck('name', 'id')->toArray(),
+            'items' => Item::orderBy('name')->pluck('name', 'id'),
+            'characters' => Character::myo(false)->orderBy('slug')->pluck('slug', 'id'),
+            'currencies' => Currency::where('is_user_owned', 1)->orderBy('name')->pluck('name', 'id'),
+            'tables' => LootTable::orderBy('name')->pluck('name', 'id'),
+            'raffles' => Raffle::where('rolled_at', null)->where('is_active', 1)->orderBy('name')->pluck('name', 'id'),
         ]);
     }
 
@@ -67,7 +75,7 @@ class RaffleController extends Controller
      */
     public function postCreateEditRaffle(Request $request, RaffleService $service, $id = null)
     {
-        $data = $request->only(['name', 'is_active', 'winner_count', 'group_id', 'order']);
+        $data = $request->only(['name', 'is_active', 'winner_count', 'group_id', 'order', 'rewardable_type', 'rewardable_id', 'quantity', 'description', 'has_join_button']);
         $raffle = null;
         if (!$id) $raffle = $service->createRaffle($data);
         else if ($id) $raffle = $service->updateRaffle($data, Raffle::find($id));

@@ -14,6 +14,8 @@
 @if(count($raffles))
     <?php $prevGroup = null; ?>
     <ul class="list-group mb-3">
+    {!! $raffles->render() !!}
+
     @foreach($raffles as $raffle)
 
         @if($prevGroup != $raffle->group_id)
@@ -27,10 +29,40 @@
         @endif
 
         <li class="list-group-item">
-            <a href="{{ url('raffles/view/'.$raffle->id) }}">{{ $raffle->name }}</a>
+            <div class="card">
+                <div class="card-header"><h5 class="row m-0"><a class="col-lg-10 col-12 p-0" href="{{ url('raffles/view/'.$raffle->id) }}">{{ $raffle->name }}</a><a class="col-lg-2 col-12 btn btn-sm bg-light border ml-auto mr-0" href="{{ url('raffles/view/'.$raffle->id) }}"><i class="fas fa-ticket-alt"></i> Tickets</a></h5></div>
+                @if($raffle->parsed_description || $raffle->rewards->count() >= 1)
+                <div class="card-body">
+                    @if($raffle->parsed_description)
+                        {!! $raffle->parsed_description !!} 
+                        <hr>
+                    @endif
+                    @if($raffle->rewards->count() >= 1)
+                        A total of {{ $raffle->winner_count}} winner(s) will receive the following rewards:
+                        <div class="row justify-content-center">
+                        @foreach($raffle->rewards as $reward)
+                            <div class="col-lg-4 col-12 mt-3">
+                                @if($reward->rewardImage)<div class="row justify-content-center"><img class="border rounded" src="{{ $reward->rewardImage }}" alt="{{ $reward->reward()->first()->name }}" style="max-width:100%;" /></div>@endif
+                                <div class="row justify-content-center"><span class="mr-1">{{ $reward->quantity }}</span> {!! $reward->reward()->first()->displayName !!}</div>
+                            </div>
+                        @endforeach
+                        </div>
+                    @endif
+                    @if($raffle->has_join_button && !$raffle->rolled_at)
+                        @if(Auth::user())
+                        <a href="/raffles/join/{{$raffle->id}}" class="btn btn-primary float-right @if($raffle->tickets()->where('user_id', Auth::user()->id)->count() >= 1) disabled @endif">Join Raffle</a>
+                        @else
+                        <div class="float-right"><i>You must be logged in to join the raffle.</i></div>
+                        @endif
+                    @endif
+                </div>
+                @endif
+            </div>
         </li>
         <?php $prevGroup = $raffle->group_id; ?>
     @endforeach
+    {!! $raffles->render() !!}
+
 @else 
     <p>No raffles found.</p>
 @endif
