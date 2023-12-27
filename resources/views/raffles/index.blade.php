@@ -42,7 +42,7 @@
                         <div class="row justify-content-center">
                         @foreach($raffle->rewards as $reward)
                             <div class="col-lg-4 col-12 mt-3">
-                                @if($reward->rewardImage)<div class="row justify-content-center"><img class="border rounded" src="{{ $reward->rewardImage }}" alt="{{ $reward->reward()->first()->name }}" style="max-width:100%;" /></div>@endif
+                                @if($reward->rewardImage)<div class="row justify-content-center"><a href="{{ $reward->reward()->first()->url }}"><img class="border rounded" src="{{ $reward->rewardImage }}" alt="{{ $reward->reward()->first()->name }}" style="max-width:100%;" /></a></div>@endif
                                 <div class="row justify-content-center"><span class="mr-1">{{ $reward->quantity }}</span> {!! $reward->reward()->first()->displayName !!}</div>
                             </div>
                         @endforeach

@@ -35,7 +35,7 @@
         </label>
     </div>
     <h3>Rewards (Optional)</h3>
-    <p>Rewards are credited to the user that is rolled as the winner of the raffle.</p>
+    <p>All rewards are credited to the user(s) that is/are rolled as the winner(s) of the raffle. Keep in mind that characters can only be owned by one user, so character raffles should only have one winner (otherwise it ends up with the last winner drawn).</p>
     <p>You can add loot tables containing any kind of currencies (both user- and character-attached), but be sure to keep track of which are being distributed! Character-only currencies cannot be given to users.</p>
     @include('widgets._loot_select', ['loots' => $raffle->rewards, 'showLootTables' => true, 'showRaffles' => true])
 
