@@ -204,4 +204,13 @@ return [
             ],
         ]
     ],
+    'Monitoring' => [
+        'power' => 'edit_data',
+        'links' => [
+            [
+                'name' => 'Ownership',
+                'url' => 'admin/monitoring/ownership'
+            ],
+        ]
+    ],
 ];

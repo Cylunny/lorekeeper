@@ -430,6 +430,11 @@ Route::group(['prefix' => 'reports', 'middleware' => 'power:manage_reports'], fu
     Route::post('edit/{id}/{action}', 'ReportController@postReport')->where('action', 'assign|close');
 });
 
+# MONITORING
+Route::group(['prefix' => 'monitoring', 'middleware' => 'power:manage_reports'], function() {
+    Route::get('/ownership', 'MonitoringController@getOwnership');
+});
+
 # DESIGN APPROVALS
 Route::group(['prefix' => 'designs', 'middleware' => 'power:manage_characters'], function() {
     Route::get('edit/{id}/{action}', 'DesignController@getDesignConfirmation')->where('action', 'cancel|approve|reject');
