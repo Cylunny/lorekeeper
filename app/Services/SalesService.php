@@ -235,4 +235,86 @@ class SalesService extends Service
         User::query()->update(['is_sales_unread' => 1]);
         return true;
     }
+
+    /**
+     * Rolls a sale consecutively. Each user may only win once.
+     */
+    public function rollSales($sale)
+    {
+        if(!$sale) return null;
+        DB::beginTransaction();
+
+        try {
+            foreach($sale->characters()->whereIn('type', ['raffle', 'flaffle'])->get() as $salesCharacter)
+            {
+                $winners = $this->rollWinners($salesCharacter);
+                // mark raffle as finished
+                $salesCharacter->is_open = 0;
+                $salesCharacter->save();
+
+                // remove any tickets from winners in raffles in the group that aren't completed
+                $saleCharacters = $sale->characters()->where('is_open', '!=', 0)->where('id', '!=', $salesCharacter->id)->get();
+                foreach($saleCharacters as $r)
+                {
+                    $r->tickets()->where(function($query) use ($winners) { 
+                        $query->whereIn('user_id', $winners); 
+                    })->delete();
+                }
+            }
+            $sale->is_open = 0;
+            $sale->save();
+
+            return $this->commitReturn(true);
+        } catch(\Exception $e) {
+            $this->setError('error', $e->getMessage());
+        }
+        return $this->rollbackReturn(false);
+    }
+
+
+    /**
+     * Rolls the winners of a raffle.
+     *
+     * @param  \App\Models\Sales\Sales $raffle
+     * @return array
+     */
+    private function rollWinners($salesCharacter)
+    {
+        $ticketPool = $salesCharacter->tickets;
+        $ticketCount = $ticketPool->count();
+        $winners = [];
+        for ($i = 0; $i < 1; $i++)
+        {
+            if($ticketCount == 0) break;
+
+            $num = mt_rand(0, $ticketCount - 1);
+            $winner = $ticketPool[$num];
+
+            // save ticket as winning ticket
+            $winner->update(['winner' => 1]);
+
+            // save the winning ticket's user id
+            if(isset($winner->user_id)) $winners[] = $winner->user_id;
+
+            // remove ticket from the ticket pool after pulled
+            $ticketPool->forget($num);
+            $ticketPool = $ticketPool->values();
+
+            $ticketCount--;
+
+            // remove tickets for the same user...I'm unsure how this is going to hold up with 3000 tickets,
+            foreach($ticketPool as $key=>$ticket)
+            {
+                if(($ticket->user_id != null && $ticket->user_id == $winner->user_id)) 
+                {
+                    $ticketPool->forget($key);
+                }
+
+            }
+            $ticketPool = $ticketPool->values();
+            $ticketCount = $ticketPool->count();
+        }
+        return $winners;
+    }
+
 }

@@ -264,6 +264,7 @@ Route::group(['prefix' => 'sales', 'middleware' => 'power:edit_pages'], function
     Route::post('create', 'SalesController@postCreateEditSales');
     Route::post('edit/{id?}', 'SalesController@postCreateEditSales');
     Route::post('delete/{id}', 'SalesController@postDeleteSales');
+    Route::post('roll/{id}', 'SalesController@postRollSales');
 
     Route::get('character/{slug}', 'SalesController@getCharacterInfo');
 });

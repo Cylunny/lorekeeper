@@ -8,6 +8,9 @@
 <h1>{{ $sales->id ? 'Edit' : 'Create' }} Post
     @if($sales->id)
         <a href="#" class="btn btn-danger float-right delete-sales-button">Delete Post</a>
+        {!! Form::open(['url' => 'admin/sales/roll/'.$sales->id]) !!}
+            {!! Form::submit('Roll Raffles', ['class' => 'btn btn-warning float-right h1']) !!}
+        {!! Form::close() !!}
     @endif
 </h1>
 
@@ -102,6 +105,7 @@ $( document ).ready(function() {
         e.preventDefault();
         loadModal("{{ url('admin/sales/delete') }}/{{ $sales->id }}", 'Delete Post');
     });
+
 
     $( ".datepicker" ).datetimepicker({
         dateFormat: "yy-mm-dd",

@@ -117,7 +117,7 @@ class SalesController extends Controller
      */
     public function getSaleRaffleTickets($id)
     {
-        $saleCharacter = SalesCharacter::where('id', $id)->where('is_open', 1)->whereIn('type', ['raffle', 'flaffle'])->first();
+        $saleCharacter = SalesCharacter::where('id', $id)->whereIn('type', ['raffle', 'flaffle'])->first();
         if(!$saleCharacter) throw new \Exception ("Character for sale could not be found.");
 
         return view('sales.sales_tickets', [
