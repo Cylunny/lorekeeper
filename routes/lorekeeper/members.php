@@ -198,3 +198,14 @@ Route::group(['prefix' => 'comments', 'namespace' => 'Comments'], function() {
     Route::post('/{comment}', 'CommentController@reply')->name('comments.reply');
     Route::post('/{id}/feature', 'CommentController@feature')->name('comments.feature');
 });
+
+/**************************************************************************************************
+    Sales
+**************************************************************************************************/
+# PROFILES
+Route::group(['prefix' => 'sales'], function() {
+
+    Route::post('/tickets/{id}/add', 'SalesController@postEnterSaleRaffle');
+    Route::post('/tickets/{id}/delete', 'SalesController@postRetractSaleRaffle');
+
+});

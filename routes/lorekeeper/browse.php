@@ -35,6 +35,9 @@ Route::group(['prefix' => 'sales'], function() {
     Route::get('/', 'SalesController@getIndex');
     Route::get('{id}.{slug?}', 'SalesController@getSales');
     Route::get('{id}.', 'SalesController@getSales');
+
+    Route::get('/tickets/{id}', 'SalesController@getSaleRaffleTickets');
+
 });
 
 /**************************************************************************************************

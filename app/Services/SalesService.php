@@ -83,15 +83,16 @@ class SalesService extends Service
 
             // The character identification comes in both the slug field and as character IDs
             // First, check if the characters are accessible to begin with.
-            if(isset($data['slug'])) {
+            if(isset($data['slug'])){
                 $characters = Character::myo(0)->visible()->whereIn('slug', $data['slug'])->get();
                 if(count($characters) != count($data['slug'])) throw new \Exception("One or more of the selected characters do not exist.");
+                $this->processCharacters($sales, $data);
+                // Remove existing attached characters, whose slug is not in the data
+                $sales->characters()->whereNotIn('character_id', $characters->pluck('id'))->delete();
+            } else {
+                // no slug set = remove all sales characters
+                $sales->characters()->delete();
             }
-            else $characters = [];
-
-            // Remove existing attached characters, then process entered character data
-            $sales->characters()->delete();
-            if(isset($data['slug'])) $this->processCharacters($sales, $data);
 
             $sales->update($data);
 
@@ -112,7 +113,9 @@ class SalesService extends Service
     private function processCharacters($sales, $data)
     {
         foreach($data['slug'] as $key=>$slug) {
+
             $character = Character::myo(0)->visible()->where('slug', $slug)->first();
+            $salesCharacter = $sales->characters()->where('character_id', $character->id)->first();
 
             // Assemble data
             $charData[$key] = [];
@@ -149,16 +152,31 @@ class SalesService extends Service
             $validator = Validator::make($charData[$key], SalesCharacter::$rules);
             if($validator->fails()) throw new \Exception($validator->errors()->first());
 
-            // Record data/attach the character to the sales post
-            SalesCharacter::create([
-                'character_id' => $character->id,
-                'sales_id' => $sales->id,
-                'type' => $charData[$key]['type'],
-                'data' => json_encode($charData[$key]),
-                'description' => isset($data['description'][$key]) ? $data['description'][$key] : null,
-                'link' => isset($data['link'][$key]) ? $data['link'][$key] : null,
-                'is_open' => isset($data['character_is_open'][$character->slug]) ? $data['character_is_open'][$character->slug] : ($data['new_entry'][$key] ? 1 : 0)
-            ]);
+            if(isset($salesCharacter)){
+                // update existing salescharacter
+                $salesCharacter->update([
+                    'character_id' => $character->id,
+                    'sales_id' => $sales->id,
+                    'type' => $charData[$key]['type'],
+                    'data' => json_encode($charData[$key]),
+                    'description' => isset($data['description'][$key]) ? $data['description'][$key] : null,
+                    'link' => isset($data['link'][$key]) ? $data['link'][$key] : null,
+                    'is_open' => isset($data['character_is_open'][$character->slug]) ? $data['character_is_open'][$character->slug] : ($data['new_entry'][$key] ? 1 : 0)
+                ]);
+            } else {
+                // create new salescharacter
+                SalesCharacter::create([
+                    'character_id' => $character->id,
+                    'sales_id' => $sales->id,
+                    'type' => $charData[$key]['type'],
+                    'data' => json_encode($charData[$key]),
+                    'description' => isset($data['description'][$key]) ? $data['description'][$key] : null,
+                    'link' => isset($data['link'][$key]) ? $data['link'][$key] : null,
+                    'is_open' => isset($data['character_is_open'][$character->slug]) ? $data['character_is_open'][$character->slug] : ($data['new_entry'][$key] ? 1 : 0)
+                ]);
+            }
+
+
         }
     }
 
