@@ -23,6 +23,7 @@ use App\Models\Character\CharacterCategory;
 use App\Models\Character\CharacterFeature;
 use App\Models\Character\CharacterImage;
 use App\Models\Character\CharacterTransfer;
+use App\Models\Character\CharacterAuthorization;
 use App\Models\Character\CharacterDesignUpdate;
 use App\Models\Character\CharacterBookmark;
 use App\Models\User\UserCharacterLog;
@@ -1272,7 +1273,10 @@ class CharacterManager extends Service
                 $character->is_gift_art_allowed = isset($data['is_gift_art_allowed']) && $data['is_gift_art_allowed'] <= 2 ? $data['is_gift_art_allowed'] : 0;
                 $character->is_gift_writing_allowed = isset($data['is_gift_writing_allowed']) && $data['is_gift_writing_allowed'] <= 2 ? $data['is_gift_writing_allowed'] : 0;
                 $character->is_trading = isset($data['is_trading']);
+                $character->is_hidden = isset($data['is_hidden']);
                 $character->save();
+                $this->updateAuthorizations($character, $data['authorized']);
+
             }
 
             // Update the character's profile
@@ -1305,6 +1309,18 @@ class CharacterManager extends Service
             $this->setError('error', $e->getMessage());
         }
         return $this->rollbackReturn(false);
+    }
+
+    private function updateAuthorizations($character, $authorizedIds){
+        //delete all auth because we wont run out of ids anyway 
+        $character->authorizations()->delete();
+        //save new auths
+        foreach($authorizedIds as $userId){
+            CharacterAuthorization::create([
+                'user_id' => $userId,
+                'character_id' => $character->id
+            ]);
+        }
     }
 
     /**

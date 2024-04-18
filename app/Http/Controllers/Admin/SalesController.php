@@ -63,6 +63,7 @@ class SalesController extends Controller
     public function getCharacterInfo($slug)
     {
         $character = Character::visible()->where('slug', $slug)->first();
+        if(!$character->isAuthorized(Auth::user())) $character = null;
 
         return view('home._character', [
             'character' => $character,

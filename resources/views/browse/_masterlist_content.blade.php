@@ -141,17 +141,31 @@
     @foreach($characters->chunk(4) as $chunk)
         <div class="row">
             @foreach($chunk as $character)
+            @if(!$character->isAuthorized(Auth::user()))
+            <div class="col-md-3 col-6 text-center">
+                <div>
+                    <a href="#"><img src="{{ url('/public/images/characters.png') }}" class="img-thumbnail" alt="Thumbnail for {{ $character->fullName }}"/></a>
+                </div>
+                <div class="mt-1">
+                    <a href="#" class="h5 mb-0">@if(!$character->is_visible || $character->is_hidden) <i class="fas fa-eye-slash"></i> @endif {{ $character->slug }}</a>
+                </div>
+                <div class="small">
+                    {!! $character->image->species_id ? $character->image->species->displayName : 'No Species' !!} ・ {!! $character->image->rarity_id ? $character->image->rarity->displayName : 'No Rarity' !!}
+                </div>
+            </div>
+            @else
             <div class="col-md-3 col-6 text-center">
                 <div>
                     <a href="{{ $character->url }}"><img src="{{ $character->image->thumbnailUrl }}" class="img-thumbnail" alt="Thumbnail for {{ $character->fullName }}"/></a>
                 </div>
                 <div class="mt-1">
-                    <a href="{{ $character->url }}" class="h5 mb-0">@if(!$character->is_visible) <i class="fas fa-eye-slash"></i> @endif {{ $character->fullName }}</a>
+                    <a href="{{ $character->url }}" class="h5 mb-0">@if(!$character->is_visible || $character->is_hidden) <i class="fas fa-eye-slash"></i> @endif {{ $character->fullName }}</a>
                 </div>
                 <div class="small">
                     {!! $character->image->species_id ? $character->image->species->displayName : 'No Species' !!} ・ {!! $character->image->rarity_id ? $character->image->rarity->displayName : 'No Rarity' !!} ・ {!! $character->displayOwner !!}
                 </div>
             </div>
+            @endif
             @endforeach
         </div>
     @endforeach

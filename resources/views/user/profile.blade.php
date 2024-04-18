@@ -96,7 +96,7 @@
     @endif
 </h2>
 
-@foreach($characters->take(4)->get()->chunk(4) as $chunk)
+@foreach($characters->take(4)->chunk(4) as $chunk)
     <div class="row mb-4">
         @foreach($chunk as $character)
             <div class="col-md-3 col-6 text-center">
@@ -104,7 +104,7 @@
                     <a href="{{ $character->url }}"><img src="{{ $character->image->thumbnailUrl }}" class="img-thumbnail" alt="{{ $character->fullName }}" /></a>
                 </div>
                 <div class="mt-1">
-                    <a href="{{ $character->url }}" class="h5 mb-0"> @if(!$character->is_visible) <i class="fas fa-eye-slash"></i> @endif {{ $character->fullName }}</a>
+                    <a href="{{ $character->url }}" class="h5 mb-0"> @if(!$character->is_visible || $character->is_hidden) <i class="fas fa-eye-slash"></i> @endif {{ $character->fullName }}</a>
                 </div>
             </div>
         @endforeach

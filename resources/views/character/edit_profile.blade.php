@@ -49,7 +49,17 @@
                 {!! Form::select('is_gift_writing_allowed', [0 => 'No', 1 => 'Yes', 2 => 'Ask First'], $character->is_gift_writing_allowed, ['class' => 'form-control user-select']) !!}
             </div>
         </div>
+        <div class="row">
+            <div class="col-md form-group">
+            {!! Form::label('authorized[]', 'Authorized User(s)') !!} {!! add_help('Select up to 25 users that will be able to see your character even if it is hidden. Staff can always see your character.') !!}
+            {!! Form::select('authorized[]', $users, $authorized, ['id' => 'usernameList', 'class' => 'form-control', 'multiple']) !!}
+            </div>
+        </div>
     @endif
+        <div class="form-group disabled">
+            {!! Form::checkbox('is_hidden', 1, $character->is_hidden, ['class' => 'form-check-input', 'data-toggle' => 'toggle']) !!}
+            {!! Form::label('is_hidden', 'Hide', ['class' => 'form-check-label ml-3']) !!} {!! add_help('Check if this character should be hidden. Only staff, authorized users and yourself will be able to see it.') !!}
+        </div>
     @if($character->is_tradeable ||  $character->is_sellable)
         <div class="form-group disabled">
             {!! Form::checkbox('is_trading', 1, $character->is_trading, ['class' => 'form-check-input', 'data-toggle' => 'toggle']) !!}
@@ -70,4 +80,12 @@
 </div>
 {!! Form::close() !!}
 
+@endsection
+
+@section('scripts')
+<script>
+    $('#usernameList').selectize({
+        maxItems: 25
+    });
+</script>
 @endsection

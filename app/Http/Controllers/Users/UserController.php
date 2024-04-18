@@ -65,7 +65,12 @@ class UserController extends Controller
     {
         $characters = $this->user->characters();
         if(!Auth::check() || !(Auth::check() && Auth::user()->hasPower('manage_characters'))) $characters->visible();
-        
+
+        //filter out characters that are hidden
+        $characters = $characters->orderBy('sort', 'DESC')->get()->filter(function($character){
+            return $character->isAuthorized(Auth::user());
+        });
+
         return view('user.profile', [
             'user' => $this->user,
             'items' => $this->user->items()->where('count', '>', 0)->orderBy('user_items.updated_at', 'DESC')->take(4)->get(),
@@ -118,9 +123,14 @@ class UserController extends Controller
 
         if(!Auth::check() || !(Auth::check() && Auth::user()->hasPower('manage_characters'))) $query->visible();
 
+        //filter out characters that are hidden
+        $characters = $query->orderBy('sort', 'DESC')->get()->filter(function($character){
+            return $character->isAuthorized(Auth::user());
+        });
+
         return view('user.characters', [
             'user' => $this->user,
-            'characters' => $query->orderBy('sort', 'DESC')->get(),
+            'characters' => $characters,
             'sublists' => Sublist::orderBy('sort', 'DESC')->get()
         ]);
     }
@@ -148,9 +158,14 @@ class UserController extends Controller
 
         if(!Auth::check() || !(Auth::check() && Auth::user()->hasPower('manage_characters'))) $query->visible();
 
+        //filter out characters that are hidden
+        $characters = $query->orderBy('sort', 'DESC')->get()->filter(function($character){
+            return $character->isAuthorized(Auth::user());
+        });
+
         return view('user.sublist', [
             'user' => $this->user,
-            'characters' => $query->orderBy('sort', 'DESC')->get(),
+            'characters' => $characters,
             'sublist' => $sublist,
             'sublists' => Sublist::orderBy('sort', 'DESC')->get()
         ]);

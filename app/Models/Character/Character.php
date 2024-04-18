@@ -15,6 +15,7 @@ use App\Models\Character\Character;
 use App\Models\Character\CharacterCategory;
 use App\Models\Character\CharacterTransfer;
 use App\Models\Character\CharacterBookmark;
+use App\Models\Character\CharacterAuthorization;
 
 use App\Models\Character\CharacterCurrency;
 use App\Models\Currency\Currency;
@@ -43,7 +44,7 @@ class Character extends Model
         'is_sellable', 'is_tradeable', 'is_giftable',
         'sale_value', 'transferrable_at', 'is_visible',
         'is_gift_art_allowed', 'is_gift_writing_allowed', 'is_trading', 'sort',
-        'is_myo_slot', 'name', 'trade_id', 'owner_url'
+        'is_myo_slot', 'name', 'trade_id', 'owner_url', 'is_hidden'
     ];
 
     /**
@@ -208,6 +209,14 @@ class Character extends Model
         return $this->belongsToMany('App\Models\Item\Item', 'character_items')->withPivot('count', 'data', 'updated_at', 'id')->whereNull('character_items.deleted_at');
     }
 
+    /**
+     * Get the character's authorizations.
+     */
+    public function authorizations()
+    {
+        return $this->hasMany('App\Models\Character\CharacterAuthorization', 'character_id');
+    }
+
     /**********************************************************************************************
 
         SCOPES
@@ -358,6 +367,7 @@ class Character extends Model
     {
         return 'Character';
     }
+
 
     /**********************************************************************************************
 
@@ -545,5 +555,17 @@ class Character extends Model
                     'character_name' => $this->fullName
                 ]);
         }
+    }
+
+    /**
+     * Check whether a user is authorized to see this character or not.
+     *
+     * @return string
+     */
+    public function isAuthorized($user)
+    {
+        $authorized = $this->authorizations()->pluck('user_id');
+        if($this->is_hidden && !($user && ($user->id == $this->user_id || $user->isStaff || $authorized->contains($user->id)))) return false;
+        return true;
     }
 }

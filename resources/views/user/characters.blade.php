@@ -17,7 +17,7 @@
                     <a href="{{ $character->url }}"><img src="{{ $character->image->thumbnailUrl }}" class="img-thumbnail" alt="Thumbnail for {{ $character->fullName }}" /></a>
                 </div>
                 <div class="mt-1 h5">
-                    @if(!$character->is_visible) <i class="fas fa-eye-slash"></i> @endif {!! $character->displayName !!}
+                    @if(!$character->is_visible || $character->is_hidden) <i class="fas fa-eye-slash"></i> @endif {!! $character->displayName !!}
                 </div>
             </div>
         @endforeach

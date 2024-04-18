@@ -258,6 +258,7 @@ class GalleryController extends Controller
     public function getCharacterInfo($slug)
     {
         $character = Character::visible()->where('slug', $slug)->first();
+        if(!$character->isAuthorized(Auth::user())) $character = null;
 
         return view('galleries._character', [
             'character' => $character,

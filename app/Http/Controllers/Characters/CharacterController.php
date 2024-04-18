@@ -59,6 +59,7 @@ class CharacterController extends Controller
             if(!(Auth::check() && Auth::user()->hasPower('manage_characters'))) $query->where('is_visible', 1);
             $this->character = $query->first();
             if(!$this->character) abort(404);
+            if(!$this->character->isAuthorized(Auth::user())) abort(404);
 
             $this->character->updateOwner();
             return $next($request);
@@ -107,6 +108,8 @@ class CharacterController extends Controller
 
         return view('character.edit_profile', [
             'character' => $this->character,
+            'users' => User::orderBy('id')->pluck('name', 'id'),
+            'authorized' => $this->character->authorizations->pluck('user_id'),
         ]);
     }
 
@@ -128,7 +131,7 @@ class CharacterController extends Controller
 
         $request->validate(CharacterProfile::$rules);
 
-        if($service->updateCharacterProfile($request->only(['name', 'link', 'text', 'is_gift_art_allowed', 'is_gift_writing_allowed', 'is_trading', 'alert_user']), $this->character, Auth::user(), !$isOwner)) {
+        if($service->updateCharacterProfile($request->only(['name', 'link', 'text', 'is_gift_art_allowed', 'is_gift_writing_allowed', 'is_trading', 'alert_user', 'is_hidden', 'authorized']), $this->character, Auth::user(), !$isOwner)) {
             flash('Profile edited successfully.')->success();
         }
         else {
