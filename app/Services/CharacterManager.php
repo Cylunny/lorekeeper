@@ -1275,7 +1275,7 @@ class CharacterManager extends Service
                 $character->is_trading = isset($data['is_trading']);
                 $character->is_hidden = isset($data['is_hidden']);
                 $character->save();
-                $this->updateAuthorizations($character, $data['authorized']);
+                $this->updateAuthorizations($character, $data);
 
             }
 
@@ -1311,16 +1311,20 @@ class CharacterManager extends Service
         return $this->rollbackReturn(false);
     }
 
-    private function updateAuthorizations($character, $authorizedIds){
+    private function updateAuthorizations($character, $data){
         //delete all auth because we wont run out of ids anyway 
         $character->authorizations()->delete();
-        //save new auths
-        foreach($authorizedIds as $userId){
-            CharacterAuthorization::create([
-                'user_id' => $userId,
-                'character_id' => $character->id
-            ]);
+
+        if(isset($data["authorized"])){
+            //save new auths
+            foreach($data["authorized"] as $userId){
+                CharacterAuthorization::create([
+                    'user_id' => $userId,
+                    'character_id' => $character->id
+                ]);
+            }
         }
+
     }
 
     /**

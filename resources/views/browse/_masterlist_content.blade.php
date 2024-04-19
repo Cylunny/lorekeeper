@@ -144,7 +144,7 @@
             @if(!$character->isAuthorized(Auth::user()))
             <div class="col-md-3 col-6 text-center">
                 <div>
-                    <a href="#"><img src="{{ url('/public/images/characters.png') }}" class="img-thumbnail" alt="Thumbnail for {{ $character->fullName }}"/></a>
+                    <a href="#"><img src="{{ url('/images/characters.png') }}" class="img-thumbnail" alt="Thumbnail for {{ $character->fullName }}"/></a>
                 </div>
                 <div class="mt-1">
                     <a href="#" class="h5 mb-0">@if(!$character->is_visible || $character->is_hidden) <i class="fas fa-eye-slash"></i> @endif {{ $character->slug }}</a>
