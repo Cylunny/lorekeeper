@@ -78,6 +78,8 @@
                             <a href="{{ $character->link }}">{{ $character->typeLink }}</a>
                         @endif
                     </h6>
+                    <p>{!! $character->description !!}</p>
+
                     @if($character->isRaffle())
                         <hr>
                         <i><a href="/sales/tickets/{{ $character->id }}">View Tickets</a></i>
@@ -95,7 +97,10 @@
                         @endif
                     @endif
 
-                    <p>{!! $character->description !!}</p>
+                    @if($character->isRaffle() && !Auth::user() && $character->is_open && $sales->is_open)
+                        <br><i>You must be logged in to enter the raffle!</i>
+                    @endif
+
                 </div>
             </div>
         </div>
