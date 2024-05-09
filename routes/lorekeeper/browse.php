@@ -90,6 +90,9 @@ Route::group(['prefix' => 'myo', 'namespace' => 'Characters'], function() {
     Route::get('{id}/ownership', 'MyoController@getCharacterOwnershipLogs');
     Route::get('{id}/change-log', 'MyoController@getCharacterLogs');
 });
+Route::group(['prefix' => 'maker', 'namespace' => 'Characters'], function() {
+    Route::get('', 'CharacterMakerController@getCharacterMaker');
+});
 
 
 /**************************************************************************************************
