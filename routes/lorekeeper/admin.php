@@ -226,6 +226,32 @@ Route::group(['prefix' => 'data', 'namespace' => 'Data', 'middleware' => 'power:
     Route::post('prompts/create', 'PromptController@postCreateEditPrompt');
     Route::post('prompts/edit/{id?}', 'PromptController@postCreateEditPrompt');
     Route::post('prompts/delete/{id}', 'PromptController@postDeletePrompt');
+
+    # CHARACTER CREATORS
+    Route::get('creators', 'CharacterCreatorController@getIndex');
+    Route::get('creators/create', 'CharacterCreatorController@getCreateCharacterCreator');
+    Route::get('creators/edit/{id}', 'CharacterCreatorController@getEditCharacterCreator');
+    Route::get('creators/delete/{id}', 'CharacterCreatorController@getDeleteCharacterCreator');
+    Route::post('creators/create', 'CharacterCreatorController@postCreateEditCharacterCreator');
+    Route::post('creators/edit/{id?}', 'CharacterCreatorController@postCreateEditCharacterCreator');
+    Route::post('creators/delete/{id}', 'CharacterCreatorController@postDeleteCharacterCreator');
+    # LAYER GROUPS
+    Route::get('creators/layergroup/create/{creator_id}', 'CharacterCreatorController@getCreateLayerGroup');
+    Route::get('creators/layergroup/edit/{id}', 'CharacterCreatorController@getEditLayerGroup');
+    Route::get('creators/layergroup/delete/{id}', 'CharacterCreatorController@getDeleteLayerGroup');
+    Route::post('creators/layergroup/create/{creator_id}', 'CharacterCreatorController@postCreateEditLayerGroup');
+    Route::post('creators/layergroup/edit/{id?}', 'CharacterCreatorController@postCreateEditLayerGroup');
+    Route::post('creators/layergroup/delete/{id}', 'CharacterCreatorController@postDeleteLayerGroup');
+    Route::post('creators/layergroup/sort', 'CharacterCreatorController@postSortLayerGroup');
+    # LAYER OPTIONS
+    Route::get('creators/layeroption/create/{group_id}', 'CharacterCreatorController@getCreateLayerOption');
+    Route::get('creators/layeroption/edit/{id}', 'CharacterCreatorController@getEditLayerOption');
+    Route::get('creators/layeroption/delete/{id}', 'CharacterCreatorController@getDeleteLayerOption');
+    Route::post('creators/layeroption/create/{group_id}', 'CharacterCreatorController@postCreateEditLayerOption');
+    Route::post('creators/layeroption/edit/{id?}', 'CharacterCreatorController@postCreateEditLayerOption');
+    Route::post('creators/layeroption/delete/{id}', 'CharacterCreatorController@postDeleteLayerOption');
+    Route::post('creators/layeroption/sort', 'CharacterCreatorController@postSortLayerOption');
+
 });
 
 

@@ -9,15 +9,15 @@ use Auth;
 use Route;
 use Settings;
 use App\Models\User\User;
-use App\Models\Character\Character;
+use App\Models\CharacterCreator\CharacterCreator;
 use App\Http\Controllers\Controller;
 use Intervention\Image\ImageManagerStatic as Image;
 
-class CharacterMakerController extends Controller
+class CharacterCreatorController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | Character Maker Controller
+    | Character Creator Controller
     |--------------------------------------------------------------------------
     |
     | Handles routes related to the character creator.
@@ -26,13 +26,13 @@ class CharacterMakerController extends Controller
     */
 
     /**
-     * Shows the character maker.
+     * Shows the character creator index.
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function getCharacterMaker()
+    public function getIndex()
     {
-        $path = 'images/data/character_maker/body_clr.png';
+        $path = 'images/data/character_creator/body_clr.png';
         $color = '#F35ED1';
 
         // CALC EXPLANATION
@@ -48,12 +48,27 @@ class CharacterMakerController extends Controller
 
         // Color the Image
         $colored = Image::make($path)->colorize(-$rFactor, -$gFactor, -$bFactor);
-        $merged = Image::make($path)->colorize(-$rFactor, -$gFactor, -$bFactor)->insert('images/data/character_maker/eyes_lin.png');
-        return view('character.maker.index', [
+        $merged = Image::make($path)->colorize(-$rFactor, -$gFactor, -$bFactor)->insert('images/data/character_creator/eyes_lin.png');
+        return view('character.creator.index', [
             'image' => base64_encode(file_get_contents($path)),
             'colored_image' => $colored->encode('data-url'),
             'merged_image' => $merged->encode('data-url')
         ]);
+    }
+
+
+    /**
+     * Shows a specific creator.
+     *
+     * @param  string  $slug
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getCharacterCreator($id, $slug = null)
+    {
+        $creator = CharacterCreator::where('id', $id)->visible()->first();
+
+        if(!$creator) abort(404);
+        return view('character.creator.creator', ['creator' => $creator]);
     }
 
 }
