@@ -144,8 +144,6 @@ class CharacterCreatorController extends Controller
         return view('admin.creator.create_edit_layer_group', [
             'creator' => $creator,
             'group' => new LayerGroup,
-            'items' => [null => 'No item'] + Item::all()->pluck('name', 'id')->toArray(),
-            'currencies' => [null => 'No Currency'] + Currency::all()->pluck('name', 'id')->toArray()
         ]);
     }
 
@@ -162,8 +160,6 @@ class CharacterCreatorController extends Controller
         return view('admin.creator.create_edit_layer_group', [
             'creator' => $group->creator,
             'group' => $group,
-            'items' => [null => 'No item'] + Item::all()->pluck('name', 'id')->toArray(),
-            'currencies' => [null => 'No Currency'] + Currency::all()->pluck('name', 'id')->toArray()
         ]);
     }
 
@@ -179,7 +175,7 @@ class CharacterCreatorController extends Controller
     {
         $id ? $request->validate(LayerGroup::$updateRules) : $request->validate(LayerGroup::$createRules);
         $data = $request->only([
-            'name', 'description'
+            'name', 'description', 'is_mandatory'
         ]);
         if (str_contains($request->getPathInfo(), 'edit') && $service->updateLayerGroup(LayerGroup::find($id), $data)) {
             flash('LayerGroup updated successfully.')->success();
@@ -233,11 +229,10 @@ class CharacterCreatorController extends Controller
      */
     public function postSortLayerGroup(Request $request, CharacterCreatorService $service)
     {
-        if($service->sortLayerGroup($request->get('sort'))) {
+        if ($service->sortLayerGroup($request->get('sort'))) {
             flash('LayerGroup order updated successfully.')->success();
-        }
-        else {
-            foreach($service->errors()->getMessages()['error'] as $error) flash($error)->error();
+        } else {
+            foreach ($service->errors()->getMessages()['error'] as $error) flash($error)->error();
         }
         return redirect()->back();
     }
@@ -253,15 +248,14 @@ class CharacterCreatorController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function getCreateLayerOption($creator_id)
+    public function getCreateLayerOption($group_id)
     {
-        $creator = CharacterCreator::find($creator_id);
-        if (!$creator) abort(404);
-        return view('admin.creator.create_edit_layer_group', [
-            'creator' => $creator,
-            'group' => new LayerGroup,
-            'items' => [null => 'No item'] + Item::all()->pluck('name', 'id')->toArray(),
-            'currencies' => [null => 'No Currency'] + Currency::all()->pluck('name', 'id')->toArray()
+        $group = LayerGroup::find($group_id);
+        if (!$group) abort(404);
+        return view('admin.creator.create_edit_layer_option', [
+            'creator' => $group->creator,
+            'group' => $group,
+            'option' => new LayerOption,
         ]);
     }
 
@@ -273,13 +267,12 @@ class CharacterCreatorController extends Controller
      */
     public function getEditLayerOption($id)
     {
-        $group = LayerGroup::find($id);
-        if (!$group) abort(404);
-        return view('admin.creator.create_edit_layer_group', [
-            'creator' => $group->creator,
-            'group' => $group,
-            'items' => [null => 'No item'] + Item::all()->pluck('name', 'id')->toArray(),
-            'currencies' => [null => 'No Currency'] + Currency::all()->pluck('name', 'id')->toArray()
+        $option = LayerOption::find($id);
+        if (!$option) abort(404);
+        return view('admin.creator.create_edit_layer_option', [
+            'creator' => $option->layerGroup->creator,
+            'group' => $option->layerGroup,
+            'option' => $option,
         ]);
     }
 
@@ -293,15 +286,15 @@ class CharacterCreatorController extends Controller
      */
     public function postCreateEditLayerOption(Request $request, CharacterCreatorService $service, $id = null)
     {
-        $id ? $request->validate(LayerGroup::$updateRules) : $request->validate(LayerGroup::$createRules);
+        $id ? $request->validate(LayerOption::$updateRules) : $request->validate(LayerOption::$createRules);
         $data = $request->only([
             'name', 'description'
         ]);
-        if (str_contains($request->getPathInfo(), 'edit') && $service->updateLayerGroup(LayerGroup::find($id), $data)) {
-            flash('LayerGroup updated successfully.')->success();
-        } else if (!str_contains($request->getPathInfo(), 'edit') && $creator = $service->createLayerGroup($data, $id)) {
-            flash('LayerGroup created successfully.')->success();
-            return redirect()->to('admin/data/creators/layergroup/edit/' . $creator->id);
+        if (str_contains($request->getPathInfo(), 'edit') && $service->updateLayerOption(LayerOption::find($id), $data)) {
+            flash('LayerOption updated successfully.')->success();
+        } else if (!str_contains($request->getPathInfo(), 'edit') && $creator = $service->createLayerOption($data, $id)) {
+            flash('LayerOption created successfully.')->success();
+            return redirect()->to('admin/data/creators/layeroption/edit/' . $creator->id);
         } else {
             foreach ($service->errors()->getMessages()['error'] as $error) flash($error)->error();
         }
@@ -316,9 +309,9 @@ class CharacterCreatorController extends Controller
      */
     public function getDeleteLayerOption($id)
     {
-        $group = LayerGroup::find($id);
-        return view('admin.creator._delete_layer_group', [
-            'group' => $group,
+        $option = LayerOption::find($id);
+        return view('admin.creator._delete_layer_option', [
+            'group' => $option,
         ]);
     }
 
@@ -332,12 +325,12 @@ class CharacterCreatorController extends Controller
      */
     public function postDeleteLayerOption(Request $request, CharacterCreatorService $service, $id)
     {
-        if ($id && $service->deleteCharacterCreator(LayerGroup::find($id))) {
-            flash('LayerGroup deleted successfully.')->success();
+        if ($id && $service->deleteCharacterCreator(LayerOption::find($id))) {
+            flash('LayerOption deleted successfully.')->success();
         } else {
             foreach ($service->errors()->getMessages()['error'] as $error) flash($error)->error();
         }
-        return redirect()->to('admin/data/creators/{{ $id }}');
+        return redirect()->to('admin/data/creators/layergroup/{{ $id }}');
     }
 
     /**
@@ -349,12 +342,92 @@ class CharacterCreatorController extends Controller
      */
     public function postSortLayerOption(Request $request, CharacterCreatorService $service)
     {
-        if($service->sortLayerGroup($request->get('sort'))) {
-            flash('LayerGroup order updated successfully.')->success();
-        }
-        else {
-            foreach($service->errors()->getMessages()['error'] as $error) flash($error)->error();
+        if ($service->sortLayerOption($request->get('sort'))) {
+            flash('LayerOption order updated successfully.')->success();
+        } else {
+            foreach ($service->errors()->getMessages()['error'] as $error) flash($error)->error();
         }
         return redirect()->back();
     }
+
+
+    /*****************************************************************
+     *  
+     * LAYERS
+     * 
+     ******************************************************************/
+
+    /**
+     * Shows the create layer option page. 
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getCreateLayer($option_id)
+    {
+        $option = LayerOption::find($option_id);
+        if (!$option) abort(404);
+        return view('admin.creator._create_edit_layer', [
+            'option' => $option,
+            'layer' => new Layer,
+        ]);
+    }
+
+    /**
+     * Shows the edit layer option page.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getEditLayer($id)
+    {
+        $layer = Layer::find($id);
+        if (!$layer) abort(404);
+        return view('admin.creator._create_edit_layer', [
+            'option' => $layer->option,
+            'layer' => $layer,
+        ]);
+    }
+
+    /**
+     * Creates or edits a layer.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  App\Services\CharacterCreatorService  $service
+     * @param  int|null                  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function postCreateEditLayer(Request $request, CharacterCreatorService $service, $id = null)
+    {
+        $id ? $request->validate(Layer::$updateRules) : $request->validate(Layer::$createRules);
+        $data = $request->only([
+            'name', 'image', 'type'
+        ]);
+        if (str_contains($request->getPathInfo(), 'edit') && $service->updateLayer(Layer::find($id), $data)) {
+            flash('Layer updated successfully.')->success();
+        } else if (!str_contains($request->getPathInfo(), 'edit') && $layer = $service->createLayer($data, $id)) {
+            flash('Layer created successfully.')->success();
+            return redirect()->to('admin/data/creators/layeroption/edit/' . $layer->layerOption->id);
+        } else {
+            foreach ($service->errors()->getMessages()['error'] as $error) flash($error)->error();
+        }
+        return redirect()->back();
+    }
+
+    /**
+     * Sorts layers.
+     *
+     * @param  \Illuminate\Http\Request     $request
+     * @param  App\Services\CharacterCreatorService  $service
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function postSortLayer(Request $request, CharacterCreatorService $service)
+    {
+        if ($service->sortLayer($request->get('sort'))) {
+            flash('Layer order updated successfully.')->success();
+        } else {
+            foreach ($service->errors()->getMessages()['error'] as $error) flash($error)->error();
+        }
+        return redirect()->back();
+    }
+
 }

@@ -32,11 +32,11 @@ class Layer extends Model
 
     /**
      * The attributes that are mass assignable.
-     *
+     * Layer types are: line, color, detail. 
      * @var array
      */
     protected $fillable = [
-        'name', 'sort', 'layer_option_id', 'image_extension'
+        'name', 'sort', 'layer_option_id', 'image_extension', 'type'
     ];
 
     /**
@@ -59,9 +59,7 @@ class Layer extends Model
      * @var array
      */
     public static $createRules = [
-        'name' => 'required|between:3,100',
-        'layer_option_id' => 'required',
-        'sort' => 'required',
+        'name' => 'required|between:1,100',
         'image' => 'mimes:png,gif'
     ];
 
@@ -71,9 +69,7 @@ class Layer extends Model
      * @var array
      */
     public static $updateRules = [
-        'name' => 'required|between:3,100',
-        'layer_option_id' => 'required',
-        'sort' => 'required',
+        'name' => 'required|between:1,100',
         'image' => 'mimes:png,gif'
     ];
 
@@ -105,6 +101,46 @@ class Layer extends Model
 
     **********************************************************************************************/
 
+    /**
+     * Gets the file directory containing the model's image.
+     *
+     * @return string
+     */
+    public function getImageDirectoryAttribute()
+    {
+        return 'images/data/character_creators/layers';
+    }
+
+    /**
+     * Gets the path to the file directory containing the model's image.
+     *
+     * @return string
+     */
+    public function getImagePathAttribute()
+    {
+        return public_path($this->imageDirectory);
+    }
+
+    /**
+     * Gets the URL of the model's image.
+     *
+     * @return string
+     */
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image_extension) return null;
+        return asset($this->imageDirectory . '/' . $this->imageFileName);
+    }
+
+    /**
+     * Gets the file name of the model's image.
+     *
+     * @return string
+     */
+    public function getImageFileNameAttribute()
+    {
+        return $this->id . '-layer-' . $this->image_extension;
+    }
 
     /**********************************************************************************************
 

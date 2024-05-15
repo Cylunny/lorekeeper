@@ -36,7 +36,7 @@ class LayerGroup extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'description', 'parsed_description', 'sort', 'character_creator_id'
+        'name', 'description', 'parsed_description', 'sort', 'character_creator_id', 'is_mandatory'
     ];
 
     /**
@@ -90,7 +90,7 @@ class LayerGroup extends Model
     /**
      * Get the layer options that this group has
      */
-    public function layerGroups()
+    public function layerOptions()
     {
         return $this->hasMany('App\Models\CharacterCreator\LayerOption', 'layer_group_id');
     }

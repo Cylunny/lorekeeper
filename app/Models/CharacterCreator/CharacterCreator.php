@@ -199,7 +199,7 @@ class CharacterCreator extends Model
      */
     public function getImageFileNameAttribute()
     {
-        return $this->id . '-creator-image.' . $this->image_extension;
+        return $this->id . '-creator-.' . $this->image_extension;
     }
 
 

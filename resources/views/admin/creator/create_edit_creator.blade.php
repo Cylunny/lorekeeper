@@ -87,20 +87,22 @@
 
 <hr>
 
+
+
+@if($creator->id)
 <h3>Layer Groups</h3>
 <p>
     Layer groups are meant to group multiple different options for one intended layer. Such a layer could be: hair, eyes, body, wings etc. Layer groups can be created after the creator was saved.
     Make sure to sort them with the layers that should be on top being on top of the list, and those at the bottom at the bottom. <b>Also make sure to save layer group order at least once!</b>
 </p>
-
-@if($creator->id)
 @if(!count($creator->layerGroups))
-<p>No groups found.</p>
+<p class="alert alert-secondary">No groups found.</p>
 @else
 <table class="table table-sm group-table">
     <thead>
         <tr>
             <th>Name</th>
+            <th>Mandatory</th>
             <th></th>
         </tr>
     </thead>
@@ -111,13 +113,15 @@
                 <a class="fas fa-arrows-alt-v handle mr-3" href="#"></a>
                 {{ $group->name }}
             </td>
+            <td>
+                {{ $group->is_mandatory ? 'Yes' : 'No' }}
+            </td>
             <td class="text-right">
                 <a href="{{ url('admin/data/creators/layergroup/edit/'.$group->id) }}" class="btn btn-primary">Edit</a>
             </td>
         </tr>
         @endforeach
     </tbody>
-
 </table>
 <div>
     {!! Form::open(['url' => 'admin/data/creators/layergroup/sort']) !!}
@@ -126,7 +130,7 @@
     {!! Form::close() !!}
 </div>
 @endif
-<a href="/admin/data/creators/layergroup/create/{{ $creator->id }}" class="btn btn-secondary float-right add-layer-group-button">Add Layer Group</a>
+<a href="/admin/data/creators/layergroup/create/{{ $creator->id }}" class="btn btn-secondary float-right add-layer-group-button mr-2">Add Layer Group</a>
 @endif
 
 

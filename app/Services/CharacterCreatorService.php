@@ -40,7 +40,7 @@ class CharacterCreatorService extends Service
         DB::beginTransaction();
 
         try {
-            if(isset($data['item_id']) && $data['currency_id']) throw new \Exception ("You can only set either an item or currency cost!");
+            if (isset($data['item_id']) && $data['currency_id']) throw new \Exception("You can only set either an item or currency cost!");
             $data['parsed_description'] = parse($data['description']);
             if (!isset($data['is_visible'])) $data['is_visible'] = 0;
 
@@ -53,7 +53,7 @@ class CharacterCreatorService extends Service
             $creator = CharacterCreator::create($data);
 
             if ($image) {
-                $creator->image_extension = $image->getClientOriginalExtension();
+                $creator->image_extension = uniqid('', true) .'.' . $image->getClientOriginalExtension();
                 $creator->update();
                 $this->handleImage($image, $creator->imagePath, $creator->imageFileName, null);
             }
@@ -77,7 +77,7 @@ class CharacterCreatorService extends Service
         DB::beginTransaction();
 
         try {
-            if(isset($data['item_id']) && $data['currency_id']) throw new \Exception ("You can only set either an item or currency cost!");
+            if (isset($data['item_id']) && $data['currency_id']) throw new \Exception("You can only set either an item or currency cost!");
             $data['parsed_description'] = parse($data['description']);
             if (!isset($data['is_visible'])) $data['is_visible'] = 0;
 
@@ -89,7 +89,7 @@ class CharacterCreatorService extends Service
                 unset($data['image']);
             }
             if ($image) {
-                $creator->image_extension = $image->getClientOriginalExtension();
+                $creator->image_extension = uniqid('', true) .'.' . $image->getClientOriginalExtension();
                 $creator->update();
                 $this->handleImage($image, $creator->imagePath, $creator->imageFileName, $old);
             }
@@ -122,35 +122,12 @@ class CharacterCreatorService extends Service
         DB::beginTransaction();
 
         try {
+            foreach ($creator->layerGroups as $group) {
+                $this->deleteLayerGroup($group);
+            }
             $creator->delete();
-
             return $this->commitReturn(true);
         } catch (\Exception $e) {
-            $this->setError('error', $e->getMessage());
-        }
-        return $this->rollbackReturn(false);
-    }
-
-    /**
-     * Sorts layergroup order.
-     *
-     * @param  array  $data
-     * @return bool
-     */
-    public function sortLayerGroup($data)
-    {
-        DB::beginTransaction();
-
-        try {
-            // explode the sort array and reverse it since the order is inverted
-            $sort = array_reverse(explode(',', $data));
-
-            foreach($sort as $key => $s) {
-                LayerGroup::where('id', $s)->update(['sort' => $key]);
-            }
-
-            return $this->commitReturn(true);
-        } catch(\Exception $e) { 
             $this->setError('error', $e->getMessage());
         }
         return $this->rollbackReturn(false);
@@ -175,6 +152,7 @@ class CharacterCreatorService extends Service
         try {
             $data['parsed_description'] = parse($data['description']);
             $data['character_creator_id'] = $creatorId;
+            if (!isset($data['is_mandatory'])) $data['is_mandatory'] = 0;
             $group = LayerGroup::create($data);
             return $this->commitReturn($group);
         } catch (\Exception $e) {
@@ -196,6 +174,7 @@ class CharacterCreatorService extends Service
 
         try {
             $data['parsed_description'] = parse($data['description']);
+            if (!isset($data['is_mandatory'])) $data['is_mandatory'] = 0;
             $group->update($data);
             return $this->commitReturn($group);
         } catch (\Exception $e) {
@@ -204,8 +183,8 @@ class CharacterCreatorService extends Service
         return $this->rollbackReturn(false);
     }
 
-        /**
-     * Deletes a creator.
+    /**
+     * Deletes a layergroup.
      *
      * @param  \App\Models\CharacterCreato\CharacterCreator\LayerGroup  $group
      * @return bool
@@ -215,7 +194,254 @@ class CharacterCreatorService extends Service
         DB::beginTransaction();
 
         try {
+            foreach ($group->layerOptions as $option) {
+                $this->deleteLayerOption($option);
+            }
             $group->delete();
+            return $this->commitReturn(true);
+        } catch (\Exception $e) {
+            $this->setError('error', $e->getMessage());
+        }
+        return $this->rollbackReturn(false);
+    }
+
+    /**
+     * Sorts layergroup order.
+     *
+     * @param  array  $data
+     * @return bool
+     */
+    public function sortLayerGroup($data)
+    {
+        DB::beginTransaction();
+
+        try {
+            // explode the sort array and reverse it since the order is inverted
+            $sort = array_reverse(explode(',', $data));
+
+            foreach ($sort as $key => $s) {
+                LayerGroup::where('id', $s)->update(['sort' => $key]);
+            }
+
+            return $this->commitReturn(true);
+        } catch (\Exception $e) {
+            $this->setError('error', $e->getMessage());
+        }
+        return $this->rollbackReturn(false);
+    }
+
+    /*****************************************************************
+     *  
+     * LAYER OPTIONS
+     * 
+     ******************************************************************/
+
+    /**
+     * Creates a layeroption.
+     *
+     * @param  array $data
+     * @return bool|\App\Models\CharacterCreator\LayerOption
+     */
+    public function createLayerOption($data, $groupId)
+    {
+        DB::beginTransaction();
+
+        try {
+            $data['parsed_description'] = parse($data['description']);
+            $data['layer_group_id'] = $groupId;
+            $option = LayerOption::create($data);
+            return $this->commitReturn($option);
+        } catch (\Exception $e) {
+            $this->setError('error', $e->getMessage());
+        }
+        return $this->rollbackReturn(false);
+    }
+
+    /**
+     * Updates a layeroption.
+     *
+     * @param  \App\Models\CharacterCreator\LayerOption $option
+     * @param  array                  $data 
+     * @return bool|\App\Models\CharacterCreator\LayerOption
+     */
+    public function updateLayerOption($option, $data)
+    {
+        DB::beginTransaction();
+
+        try {
+            $data['parsed_description'] = parse($data['description']);
+            $option->update($data);
+            return $this->commitReturn($option);
+        } catch (\Exception $e) {
+            $this->setError('error', $e->getMessage());
+        }
+        return $this->rollbackReturn(false);
+    }
+
+    /**
+     * Deletes a layeroption.
+     *
+     * @param  \App\Models\CharacterCreato\CharacterCreator\LayerOption  $option
+     * @return bool
+     */
+    public function deleteLayerOption($option)
+    {
+        DB::beginTransaction();
+
+        try {
+            foreach ($option->layers as $layer) {
+                $this->deleteLayer($layer);
+            }
+            $option->delete();
+            return $this->commitReturn(true);
+        } catch (\Exception $e) {
+            $this->setError('error', $e->getMessage());
+        }
+        return $this->rollbackReturn(false);
+    }
+
+    /**
+     * Sorts layeroption order.
+     *
+     * @param  array  $data
+     * @return bool
+     */
+    public function sortLayerOption($data)
+    {
+        DB::beginTransaction();
+
+        try {
+            // explode the sort array and reverse it since the order is inverted
+            $sort = array_reverse(explode(',', $data));
+
+            foreach ($sort as $key => $s) {
+                LayerOption::where('id', $s)->update(['sort' => $key]);
+            }
+
+            return $this->commitReturn(true);
+        } catch (\Exception $e) {
+            $this->setError('error', $e->getMessage());
+        }
+        return $this->rollbackReturn(false);
+    }
+
+    /*****************************************************************
+     *  
+     * LAYERS
+     * 
+     ******************************************************************/
+
+    /**
+     * Creates a layer.
+     *
+     * @param  array $data
+     * @return bool|\App\Models\CharacterCreator\Layer
+     */
+    public function createLayer($data, $optionId)
+    {
+        DB::beginTransaction();
+
+        try {
+            $data['layer_option_id'] = $optionId;
+            $image = null;
+            if (isset($data['image']) && $data['image']) {
+                $image = $data['image'];
+                unset($data['image']);
+            }
+
+            $layer = Layer::create($data);
+
+            if ($image) {
+                $layer->image_extension = uniqid('', true) .'.' . $image->getClientOriginalExtension();
+                $layer->update();
+                $this->handleImage($image, $layer->imagePath, $layer->imageFileName, null);
+            }
+            return $this->commitReturn($layer);
+        } catch (\Exception $e) {
+            $this->setError('error', $e->getMessage());
+        }
+        return $this->rollbackReturn(false);
+    }
+
+    /**
+     * Updates a layer.
+     *
+     * @param  \App\Models\CharacterCreator\Layer $layer
+     * @param  array                  $data 
+     * @return bool|\App\Models\CharacterCreator\Layer
+     */
+    public function updateLayer($layer, $data)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            $image = null;
+            if (isset($data['image']) && $data['image']) {
+                if (isset($layer->image_extension)) $old = $layer->imageFileName;
+                else $old = null;
+                $image = $data['image'];
+                unset($data['image']);
+            }
+            if ($image) {
+                $layer->image_extension = uniqid('', true) .'.' . $image->getClientOriginalExtension();
+                $layer->update();
+                $this->handleImage($image, $layer->imagePath, $layer->imageFileName, $old);
+            }
+
+            if (isset($data['remove_image'])) {
+                if ($layer && isset($layer->image_extension) && $data['remove_image']) {
+                    $data['image_extension'] = null;
+                    $this->deleteImage($layer->imagePath, $layer->imageFileName);
+                }
+                unset($data['remove_image']);
+            }
+
+            $layer->update($data);
+            return $this->commitReturn($layer);
+        } catch (\Exception $e) {
+            $this->setError('error', $e->getMessage());
+        }
+        return $this->rollbackReturn(false);
+    }
+
+    /**
+     * Deletes a layer.
+     *
+     * @param  \App\Models\CharacterCreato\CharacterCreator\Layer  $group
+     * @return bool
+     */
+    public function deleteLayer($layer)
+    {
+        DB::beginTransaction();
+
+        try {
+            $layer->delete();
+            return $this->commitReturn(true);
+        } catch (\Exception $e) {
+            $this->setError('error', $e->getMessage());
+        }
+        return $this->rollbackReturn(false);
+    }
+
+    /**
+     * Sorts layer order.
+     *
+     * @param  array  $data
+     * @return bool
+     */
+    public function sortLayer($data)
+    {
+        DB::beginTransaction();
+
+        try {
+            // explode the sort array and reverse it since the order is inverted
+            $sort = array_reverse(explode(',', $data));
+
+            foreach ($sort as $key => $s) {
+                Layer::where('id', $s)->update(['sort' => $key]);
+            }
+
             return $this->commitReturn(true);
         } catch (\Exception $e) {
             $this->setError('error', $e->getMessage());

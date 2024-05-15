@@ -61,8 +61,6 @@ class LayerOption extends Model
     public static $createRules = [
         'name' => 'required|between:3,100',
         'description' => 'nullable',
-        'layer_group_id' => 'required',
-        'sort' => 'required',
     ];
 
     /**
@@ -73,8 +71,6 @@ class LayerOption extends Model
     public static $updateRules = [
         'name' => 'required|between:3,100',
         'description' => 'nullable',
-        'layer_group_id' => 'required',
-        'sort' => 'required',
     ];
 
     /**********************************************************************************************

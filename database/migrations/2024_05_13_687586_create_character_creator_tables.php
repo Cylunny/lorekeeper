@@ -37,6 +37,7 @@ class CreateCharacterCreatorTables extends Migration
             $table->text('parsed_description')->nullable()->default(null);
             $table->integer('sort')->unsigned()->default(0); 
             $table->integer('character_creator_id')->unsigned();
+            $table->boolean('is_mandatory')->default(0);
         });
 
         Schema::create('character_creator_layer_option', function (Blueprint $table) {
@@ -58,6 +59,7 @@ class CreateCharacterCreatorTables extends Migration
             $table->integer('sort')->unsigned()->default(0); 
             $table->integer('layer_option_id')->unsigned();
             $table->string('image_extension', 191)->nullable()->default(null); 
+            $table->string('type'); 
         });
     }
 

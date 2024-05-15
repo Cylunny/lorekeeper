@@ -1,5 +1,5 @@
 @if($creator)
-    {!! Form::open(['url' => 'admin/data/creator/delete/'.$creator->id]) !!}
+    {!! Form::open(['url' => 'admin/data/creators/delete/'.$creator->id]) !!}
 
     <p>You are about to delete the character creator <strong>{{ $creator->name }}</strong>. This is not reversible. If you would like to preserve the content while preventing users from accessing the creator, you can use the viewable setting instead to hide it.</p>
     <p>Are you sure you want to delete <strong>{{ $creator->name }}</strong>?</p>
