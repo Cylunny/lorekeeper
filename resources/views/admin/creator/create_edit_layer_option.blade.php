@@ -42,7 +42,7 @@
 <h3>Layers</h3>
 <p>
     This is where you can upload the images for your layer option. In order to allow users to color in the different parts later, a layer option should consist of at least two layers: A line layer on top, and a base color layer at the bottom.
-    Optionally, you may add as many detail layers inbetween as you wish, for example to add markings.
+    Optionally, you may add as many detail layers inbetween as you wish, for example to add markings. <b>Make sure to save layer order at least once, or it may display incorrectly!</b>
 </p>
 
 

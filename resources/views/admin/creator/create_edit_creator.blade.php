@@ -133,6 +133,23 @@
 <a href="/admin/data/creators/layergroup/create/{{ $creator->id }}" class="btn btn-secondary float-right add-layer-group-button mr-2">Add Layer Group</a>
 @endif
 
+<hr>
+<h3>Preview</h3>
+<div class="creator-container bg-secondary rounded m-auto" style="max-width: 900px;">
+    @php $isBaseSet = false; @endphp
+    @foreach($creator->layerGroups()->orderBy('sort', 'ASC')->get() as $group)
+        @if($group->layerOptions()->count() > 0)
+            @foreach($group->layerOptions[0]->layers()->orderBy('sort', 'ASC')->get() as $layer)
+                @if(!$isBaseSet)
+                    <img src="{{ $layer->imageUrl }}" class="creator-base" style="max-width:100%;" data-id="{{ $layer->id }}"/>
+                    @php $isBaseSet = true; @endphp
+                @else
+                    <img src="{{ $layer->imageUrl }}" class="creator-layer" style="max-width:100%;" data-id="{{ $layer->id }}"/>
+                @endif
+            @endforeach
+        @endif
+    @endforeach
+</div>
 
 @endsection
 

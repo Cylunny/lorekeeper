@@ -3,7 +3,7 @@
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">
-            {!! Form::label('Name') !!}
+            {!! Form::label('Name (Optional)') !!}
             {!! Form::text('name', $layer->name, ['class' => 'form-control']) !!}
         </div>
     </div>

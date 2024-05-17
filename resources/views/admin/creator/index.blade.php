@@ -1,6 +1,6 @@
 @extends('admin.layout')
 
-@section('admin-title') News @endsection
+@section('admin-title') Character Creators @endsection
 
 @section('admin-content')
 {!! breadcrumbs(['Admin Panel' => 'admin', 'Character Creators' => 'admin/data/creators']) !!}

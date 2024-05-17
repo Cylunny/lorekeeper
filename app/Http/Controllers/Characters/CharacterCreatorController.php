@@ -52,7 +52,8 @@ class CharacterCreatorController extends Controller
         return view('character.creator.index', [
             'image' => base64_encode(file_get_contents($path)),
             'colored_image' => $colored->encode('data-url'),
-            'merged_image' => $merged->encode('data-url')
+            'merged_image' => $merged->encode('data-url'),
+            'creators' => CharacterCreator::visible()->get()
         ]);
     }
 
@@ -68,7 +69,10 @@ class CharacterCreatorController extends Controller
         $creator = CharacterCreator::where('id', $id)->visible()->first();
 
         if(!$creator) abort(404);
-        return view('character.creator.creator', ['creator' => $creator]);
+        return view('character.creator.creator', [
+            'creator' => $creator,
+            'creators' => CharacterCreator::visible()->get()
+        ]);
     }
 
 }

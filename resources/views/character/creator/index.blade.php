@@ -1,9 +1,9 @@
-@extends('character.maker.layout')
+@extends('character.creator.layout')
 
-@section('maker-title') Character Maker @endsection
+@section('title') Character Creators @endsection
 
-@section('maker-content')
-<h1>Character Maker</h1>
+@section('content')
+<h1>Character Creators</h1>
 
 <div class="row">
     <div class="col-4">

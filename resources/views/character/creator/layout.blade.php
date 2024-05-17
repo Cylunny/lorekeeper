@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
 @section('title') 
-    @yield('maker-title')
+    @yield('title')
 @endsection
 
 @section('sidebar')
-    @include('character.maker._sidebar')
+    @include('character.creator._sidebar')
 @endsection
 
 @section('content')
-    @yield('maker-content')
+    @yield('content')
 @endsection
 
 @section('scripts')

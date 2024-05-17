@@ -32,7 +32,7 @@ class Layer extends Model
 
     /**
      * The attributes that are mass assignable.
-     * Layer types are: line, color, detail. 
+     * Layer types are: lines, color, detail. 
      * @var array
      */
     protected $fillable = [
@@ -59,7 +59,6 @@ class Layer extends Model
      * @var array
      */
     public static $createRules = [
-        'name' => 'required|between:1,100',
         'image' => 'mimes:png,gif'
     ];
 
@@ -69,7 +68,6 @@ class Layer extends Model
      * @var array
      */
     public static $updateRules = [
-        'name' => 'required|between:1,100',
         'image' => 'mimes:png,gif'
     ];
 

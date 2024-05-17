@@ -348,14 +348,17 @@ class CharacterCreatorService extends Service
                 $image = $data['image'];
                 unset($data['image']);
             }
-
+            // temp name in case none was given
+            if(!isset($data['name'])) $data['name'] = "tempname";
             $layer = Layer::create($data);
 
             if ($image) {
                 $layer->image_extension = uniqid('', true) .'.' . $image->getClientOriginalExtension();
+                if($data['name'] == "tempname") $layer->name = $image->getClientOriginalName();
                 $layer->update();
                 $this->handleImage($image, $layer->imagePath, $layer->imageFileName, null);
             }
+
             return $this->commitReturn($layer);
         } catch (\Exception $e) {
             $this->setError('error', $e->getMessage());

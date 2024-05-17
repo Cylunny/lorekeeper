@@ -2,31 +2,9 @@
 
 namespace App\Models\CharacterCreator;
 
-use Config;
-use DB;
-use Carbon\Carbon;
-use Notifications;
 use App\Models\Model;
 use Illuminate\Support\Str;
-
-use App\Models\User\User;
-use App\Models\User\UserCharacterLog;
-
-use App\Models\Character\CharacterCategory;
-use App\Models\Character\CharacterTransfer;
-use App\Models\Character\CharacterBookmark;
-
-use App\Models\Character\CharacterCurrency;
-use App\Models\Currency\Currency;
-use App\Models\Currency\CurrencyLog;
-
-use App\Models\Character\CharacterItem;
-use App\Models\Item\Item;
-use App\Models\Item\ItemLog;
-
-use App\Models\Submission\Submission;
-use App\Models\Submission\SubmissionCharacter;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class CharacterCreator extends Model
 {
@@ -146,7 +124,7 @@ class CharacterCreator extends Model
      */
     public function getUrlAttribute()
     {
-        return url('maker/'.$this->slug);
+        return url('character-creator/'.$this->slug);
 
     }
 
@@ -209,5 +187,20 @@ class CharacterCreator extends Model
 
     **********************************************************************************************/
 
+    /**
+     * Gets the first image seen on a char creator, essentially, the first option of every group.
+     *
+     * @return string
+     */
+    public function merge(){
+
+        $groups = $this->layerGroups()->orderBy('sort', 'ASC')->get();
+        $merged = $groups->first()->layerOptions[0]->merge();
+        // first we have to get the last layer group.
+        foreach($this->layerGroups()->orderBy('sort', 'ASC')->get() as $group){
+            $merged->insert($group->layerOptions[0]->merge());
+        }
+        return $merged->encode('data-url');
+    }
 
 }

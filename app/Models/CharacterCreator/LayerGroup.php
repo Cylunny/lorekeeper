@@ -116,5 +116,18 @@ class LayerGroup extends Model
 
     **********************************************************************************************/
 
+    /**
+     * Gets a select ready array of all options.
+     *
+     * @return array
+     */
+    public function getOptionSelect(){
+
+        $select = [];
+        foreach($this->layerOptions as $option){
+            $select[$option->id] = $option->name;
+        }
+        return $select;
+    }
 
 }

@@ -2,30 +2,8 @@
 
 namespace App\Models\CharacterCreator;
 
-use Config;
-use DB;
-use Carbon\Carbon;
-use Notifications;
 use App\Models\Model;
-
-use App\Models\User\User;
-use App\Models\User\UserCharacterLog;
-
-use App\Models\Character\CharacterCategory;
-use App\Models\Character\CharacterTransfer;
-use App\Models\Character\CharacterBookmark;
-
-use App\Models\Character\CharacterCurrency;
-use App\Models\Currency\Currency;
-use App\Models\Currency\CurrencyLog;
-
-use App\Models\Character\CharacterItem;
-use App\Models\Item\Item;
-use App\Models\Item\ItemLog;
-
-use App\Models\Submission\Submission;
-use App\Models\Submission\SubmissionCharacter;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class LayerOption extends Model
 {
@@ -107,13 +85,50 @@ class LayerOption extends Model
         ACCESSORS
 
     **********************************************************************************************/
-
+    /**
+     * Merges layers of this option into one image.
+     *
+     * @return Image
+     */
+    public function getLineImageUrlAttribute(){
+        $line = $this->layers()->where('type', 'lines')->first();
+        return $line->imageUrl ?? null;
+    }
 
     /**********************************************************************************************
 
         OTHER FUNCTIONS
 
     **********************************************************************************************/
+
+    /**
+     * Merges layers of this option into one image.
+     *
+     * @return Image
+     */
+    public function merge(){
+
+        $layers = $this->layers()->orderBy('sort', 'ASC')->get();
+        $merged = Image::make($layers->first()->imageUrl);
+        foreach($layers as $layer){
+            $merged->insert($layer->imageUrl);
+        }
+        return $merged;
+    }
+
+    /**
+     * Gets a select ready array of all marking options.
+     *
+     * @return array
+     */
+    public function getMarkingSelect(){
+
+        $select = [];
+        foreach($this->layers()->where('type', 'detail')->get() as $layer){
+            $select[$layer->id] = $layer->name;
+        }
+        return $select;
+    }
 
 
 }
