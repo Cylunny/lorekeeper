@@ -12,6 +12,7 @@ use App\Models\User\User;
 use App\Models\CharacterCreator\CharacterCreator;
 use App\Http\Controllers\Controller;
 use Intervention\Image\ImageManagerStatic as Image;
+use App\Services\CharacterCreatorManager;
 
 class CharacterCreatorController extends Controller
 {
@@ -72,6 +73,20 @@ class CharacterCreatorController extends Controller
         return view('character.creator.creator', [
             'creator' => $creator,
             'creators' => CharacterCreator::visible()->get()
+        ]);
+    }
+
+    /**
+     * Get the image based on current form input.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getImage($id, Request $request, CharacterCreatorManager $service,)
+    {
+        $creator = CharacterCreator::where('id', $id)->visible()->first();
+        if(!$creator) abort(404);
+        return view('character.creator._image', [
+            'b64Images' => $service->getImages($creator, $request),
         ]);
     }
 

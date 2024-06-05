@@ -94,6 +94,7 @@ Route::group(['prefix' => 'character-creator', 'namespace' => 'Characters'], fun
     Route::get('', 'CharacterCreatorController@getIndex');
     Route::get('{id}.{slug?}', 'CharacterCreatorController@getCharacterCreator');
     Route::get('{id}.', 'CharacterCreatorController@getCharacterCreator');
+    Route::post('{id}/image', 'CharacterCreatorController@getImage');
 
 });
 
