@@ -128,4 +128,19 @@ class SiteFormController extends Controller {
             'form' => $form
         ]);
     }
+
+    /**
+     * Shows the results of a site form by respondent
+     *
+     * @param  int  $id
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getSiteFormResultsAlt($id) {
+        $form = SiteForm::find($id);
+        if (!$form) abort(404);
+        return view('admin.forms.site_form_results_alt', [
+            'form' => $form,
+            'userAnswers' => $form->userAnswers()->paginate(1)
+        ]);
+    }
 }
