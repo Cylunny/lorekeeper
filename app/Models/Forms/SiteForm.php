@@ -87,9 +87,10 @@ class SiteForm extends Model
     /**
      * Get the answers related to this form for a given user.
      */
-    public function userAnswers($user) 
+    public function userAnswers($user = null) 
     {
-        return $this->hasMany('App\Models\Forms\SiteFormAnswer', 'form_id')->where('user_id', $user->id)->get()->groupBy('submission_number');
+        if (isset($user)) return $this->hasMany('App\Models\Forms\SiteFormAnswer', 'form_id')->where('user_id', $user->id)->get()->groupBy('submission_number');
+        return $this->hasMany('App\Models\Forms\SiteFormAnswer', 'form_id')->orderBy('submission_number', 'DESC')->get()->groupBy('user_id');
     }
 
     /**
