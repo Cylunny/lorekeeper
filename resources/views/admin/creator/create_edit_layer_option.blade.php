@@ -42,8 +42,14 @@
 <h3>Layers</h3>
 <p>
     This is where you can upload the images for your layer option. In order to allow users to color in the different parts later, a layer option should consist of at least two layers: A line layer on top, and a base color layer at the bottom.
-    Optionally, you may add as many detail layers inbetween as you wish, for example to add markings. <b>Make sure to save layer order at least once, or it may display incorrectly!</b>
+    You can, however, add multiple color or detail layers as well.</b>
 </p>
+<ul>
+    <li><b>Line Layers</b> should be your transparent linework.</li>
+    <li><b>Color Layers</b> should be the base color matching the lines. You can make multiple color layers, such as a seperate one for sclera and iris of an eye.These will each have their own color that can be set and are not a choice.</li>
+    <li><b>Detail Layers</b> are intended for use cases such as adding markings on top of a base layer. Users can only pick one out of all detail layers. The picked layer can be colored.</li>
+
+</ul>
 
 
 @if(!$option->layers->count() > 0)

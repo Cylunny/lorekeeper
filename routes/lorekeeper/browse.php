@@ -92,10 +92,10 @@ Route::group(['prefix' => 'myo', 'namespace' => 'Characters'], function() {
 });
 Route::group(['prefix' => 'character-creator', 'namespace' => 'Characters'], function() {
     Route::get('', 'CharacterCreatorController@getIndex');
+    Route::get('choices', 'CharacterCreatorController@getChoices');
     Route::get('{id}.{slug?}', 'CharacterCreatorController@getCharacterCreator');
     Route::get('{id}.', 'CharacterCreatorController@getCharacterCreator');
     Route::post('{id}/image', 'CharacterCreatorController@getImage');
-
 });
 
 

@@ -95,6 +95,16 @@ class LayerOption extends Model
         return $line->imageUrl ?? null;
     }
 
+    /**
+     * Get the lowest color layer (base).
+     *
+     * @return Image
+     */
+    public function getBaseImageFilePathAttribute(){
+        $base = $this->layers()->where('type', 'color')->orderBy('sort')->first();
+        return $base->imageFilePath ?? null;
+    }
+
     /**********************************************************************************************
 
         OTHER FUNCTIONS

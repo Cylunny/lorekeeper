@@ -131,6 +131,17 @@ class Layer extends Model
     }
 
     /**
+     * Gets the PATH of the model's image.
+     *
+     * @return string
+     */
+    public function getImageFilePathAttribute()
+    {
+        if (!$this->image_extension) return null;
+        return $this->imageDirectory .'/'. $this->imageFileName;
+    }
+
+    /**
      * Gets the file name of the model's image.
      *
      * @return string

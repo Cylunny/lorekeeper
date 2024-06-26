@@ -10,6 +10,8 @@ use Route;
 use Settings;
 use App\Models\User\User;
 use App\Models\CharacterCreator\CharacterCreator;
+use App\Models\CharacterCreator\LayerGroup;
+use App\Models\CharacterCreator\LayerOption;
 use App\Http\Controllers\Controller;
 use Intervention\Image\ImageManagerStatic as Image;
 use App\Services\CharacterCreatorManager;
@@ -87,6 +89,23 @@ class CharacterCreatorController extends Controller
         if(!$creator) abort(404);
         return view('character.creator._image', [
             'b64Images' => $service->getImages($creator, $request),
+        ]);
+    }
+
+    
+    /**
+     * Get the updated marking select based on the current group and chosen option.
+     * @param  Request  $request
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getChoices(Request $request)
+    {
+        $groupId = $request->input('groupId');
+        $optionId = $request->input('optionId');
+
+        return view('character.creator._choices_select', [
+            'group' => LayerGroup::find($groupId),
+            'option' => LayerOption::find($optionId)
         ]);
     }
 

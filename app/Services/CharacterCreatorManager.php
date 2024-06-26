@@ -44,14 +44,15 @@ class CharacterCreatorManager extends Service
         foreach ($request->all() as $key => $value) {
             $split = explode("_", $key);
             $groupId = $split[0];
+            $selectionType = $split[1];
             $group = LayerGroup::find($groupId);
             if(isset($group)){
                 $sort = $group->sort;
                 $choicesByGroup[$sort]['groupId'] = $groupId;
-                if ($split[1] == 'option') $choicesByGroup[$sort]['option'] = $value;
-                if ($split[1] == 'marking') $choicesByGroup[$sort]['marking'] = $value;
-                if ($split[1] == 'markingcolor') $choicesByGroup[$sort]['markingcolor'] = $value;
-                if (is_numeric($split[1])) $choicesByGroup[$sort]['colorlayers'][$split[1]] = $value;
+                if ($selectionType == 'option') $choicesByGroup[$sort]['option'] = $value;
+                if ($selectionType == 'marking') $choicesByGroup[$sort]['marking'] = $value;
+                if ($selectionType == 'markingcolor') $choicesByGroup[$sort]['markingcolor'] = $value;
+                if (is_numeric($selectionType)) $choicesByGroup[$sort]['colorlayers'][$selectionType] = $value;
             }
         };
 
@@ -60,26 +61,34 @@ class CharacterCreatorManager extends Service
 
         //go over the layer choices and build the base64 images
         foreach ($choicesByGroup as $sort => $choices) {
-            // get color layers
-            foreach ($choices['colorlayers'] as $layerId => $color) {
-                $colorLayer = Layer::find($layerId);
-                $colorUrl = $this->colorize($colorLayer->imageUrl, $color);
+
+            $option = LayerOption::find($choices['option']);
+
+            // sort color layers and only include those matching the option
+            $colorLayers = array_intersect_key($choices['colorlayers'], array_flip($option->layers()->pluck('id')->toArray()));
+
+            // if color layers is empty...we add the base layer only.
+            if(count($colorLayers) <= 0){
+                $colorUrl = $this->colorize($option->baseImageFilePath, '#FFFFFF');
                 $images[] = $colorUrl;
             }
-            // get marking layer and color it then turn it into a b64 image url
-            if(isset($choices['marking'])){
-                $markingLayer = Layer::find($choices['marking']);
-                $markingUrl = $this->colorize($markingLayer->imageUrl, $choices['markingcolor']);
-                $images[] = $markingUrl;
+            // get color layers
+            foreach ($colorLayers as $layerId => $color) {
+                $colorLayer = Layer::find($layerId);
+                $colorUrl = $this->colorize($colorLayer->imageFilePath, $color);
+                $images[] = $colorUrl;
             }
 
+            // get marking layer and color it then turn it into a b64 image url
+            if(isset($choices['marking']) && $option->layers()->pluck('id')->contains($choices['marking'])){
+                $markingLayer = Layer::find($choices['marking']);
+                $markingUrl = $this->colorize($markingLayer->imageFilePath, $choices['markingcolor']);
+                $images[] = $markingUrl;
+            }
             // get line image url
-            $option = LayerOption::find($choices['option']);
             $lineImageUrl = $option->lineImageUrl;
             $images[] = $lineImageUrl;
-
         }
-
         return $images;
     }
 
