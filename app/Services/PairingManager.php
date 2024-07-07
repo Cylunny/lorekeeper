@@ -370,14 +370,20 @@ class PairingManager extends Service
      */
     public function createMyos($pairing_id, $user)
     {
+        if(!isset($pairing_id)) throw new \Exception("Pairing Id must be set.");
+
+        $pairing = Pairing::where('id', $pairing_id)->first();
+        if(!$pairing->status == 'READY') throw new \Exception("Pairing is not approved yet.");
+
+        //update status
+        $pairing->status = 'USED';
+        $pairing->save();
+
         DB::beginTransaction();
 
         try {
             
-            if(!isset($pairing_id)) throw new \Exception("Pairing Id must be set.");
 
-            $pairing = Pairing::where('id', $pairing_id)->first();
-            if(!$pairing->status == 'READY') throw new \Exception("Pairing is not approved yet.");
 
             $item = null;
             $boosts = [];
@@ -416,9 +422,7 @@ class PairingManager extends Service
 
                 if(!$myo) throw new \Exception("Could not create MYO slot.");
             }
-            //update status
-            $pairing->status = 'USED';
-            $pairing->save();
+
 
             if(!$pairing) throw new \Exception("Error happened while trying to create a MYO from the pairing.");
             $this->commitReturn($pairing);

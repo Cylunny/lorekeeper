@@ -65,7 +65,11 @@ Route::group(['prefix' => 'characters', 'namespace' => 'Users'], function() {
     Route::post('pairings', 'PairingController@createPairings');
     Route::post('pairings/approve', 'PairingController@approvePairing');
     Route::post('pairings/reject', 'PairingController@rejectPairing');
-    Route::post('pairings/myo', 'PairingController@createMyo');
+
+    // throttle requests to 1 per ~10 seconds
+    Route::middleware('throttle:1,0.16')->group(function () {
+        Route::post('pairings/myo', 'PairingController@createMyo');
+    });
 });
 
 Route::group(['prefix' => 'bank', 'namespace' => 'Users'], function() {
