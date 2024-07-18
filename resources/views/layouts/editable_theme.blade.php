@@ -36,7 +36,7 @@
     }
 @endif
 
-.navbar-dark .navbar-nav .nav-link {
+.navbar-dark .navbar-nav .nav-link, .sidebar a {
     @if($navTextColor) color: {{ $navTextColor }} !important; @endif
 }
 
@@ -62,7 +62,7 @@
 
 /** Style main background */
 
-#main {
+#app, #main {
     @if($backgroundImage) background-image: url('{{ $backgroundImage }}'); @endif
     @if($backgroundColor) background-color: {{ $backgroundColor }} !important; @endif
     @if($backgroundSize) background-size: 100% {{ $backgroundSize }}; @endif
