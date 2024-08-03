@@ -17,6 +17,7 @@
             @if(Auth::user()->id == $character->user_id)
                 <div class="sidebar-item"><a href="{{ $character->url . '/approval' }}" class="{{ set_active('myo/'.$character->id.'/approval') }}">Submit MYO Design</a></div>
             @endif
+            <div class="sidebar-item"><a href="{{ $character->url . '/approval' }}" class="delete-myo" data-id="{{ $character->id }}">Delete</a></div>
         </li>
     @endif
 </ul>

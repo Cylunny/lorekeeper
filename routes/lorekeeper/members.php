@@ -110,6 +110,9 @@ Route::group(['prefix' => 'myo', 'namespace' => 'Characters'], function() {
 
     Route::post('{id}/approval', 'MyoController@postCharacterApproval');
     Route::get('{id}/approval', 'MyoController@getCharacterApproval');
+
+    Route::get('{id}/delete', 'MyoController@getMyoDelete');
+    Route::post('{id}/delete', 'MyoController@postMyoDelete');
 });
 
 /**************************************************************************************************

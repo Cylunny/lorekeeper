@@ -273,4 +273,47 @@ class MyoController extends Controller
         }
         return redirect()->back();
     }
+    
+    /**
+     * Shows the delete MYO slot modal.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getMyoDelete($id)
+    {
+        $this->character = Character::where('is_myo_slot', 1)->where('id', $id)->first();
+        if(!$this->character) abort(404);
+
+        return view('character._delete_character_modal', [
+            'character' => $this->character,
+            'isMyo' => true
+        ]);
+    }
+
+    /**
+     * Deletes an MYO slot.
+     *
+     * @param  \Illuminate\Http\Request       $request
+     * @param  App\Services\CharacterManager  $service
+     * @param  int                            $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function postMyoDelete(Request $request, CharacterManager $service, $id)
+    {
+        $this->character = Character::where('is_myo_slot', 1)->where('id', $id)->first();
+        if(!$this->character) abort(404);
+
+        //make sure its the owner that deletes the slot, or sb that has manage character power...
+        if(!$this->character->user_id == Auth::user()->id && !Auth::user()->hasPower('manage_characters')) abort(404);
+
+        if ($service->deleteCharacter($this->character, Auth::user())) {
+            flash('MYO deleted successfully.')->success();
+            return redirect()->to('characters/myos');
+        }
+        else {
+            foreach($service->errors()->getMessages()['error'] as $error) flash($error)->error();
+        }
+        return redirect()->back();
+    }
 }
