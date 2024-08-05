@@ -27,7 +27,7 @@ class SiteDesignController extends Controller
             'Raleway' => 'Raleway',
             'Black Ops One' => 'Black Ops One',
             'Orbitron' => 'Orbitron',
-            'Concert On' => 'Concert On',
+            'Concert One' => 'Concert One',
             'Silkscreen' => 'Silkscreen',
             'Special Elite' => 'Special Elite',
             'Gloria Hallelujah' => 'Gloria Hallelujah',
