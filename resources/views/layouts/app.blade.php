@@ -97,7 +97,9 @@
     @endphp
 
     <!-- ALTERNATE SITE LAYOUTS -->
+    @isset($design)
     <link href="{{ asset('css/'. $design->design .'.css') }}" rel="stylesheet">
+    @endisset
 
     <!--Editable font css-->
     @include('layouts.editable_fonts') 
