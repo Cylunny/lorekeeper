@@ -139,7 +139,7 @@
     <div class="col-md-3">
         <div class="form-group">
             {!! Form::label('body_text_transform', 'Text Transform') !!} 
-            {!! Form::select('body_text_transform', ['uppercase' => 'uppercase', 'lowercase' => 'lowercase', 'capitalize' => 'capitalize'], $design->body_text_transform ?? 'capitalize', ['class' => 'form-control']) !!}
+            {!! Form::select('body_text_transform', ['none' => 'none', 'uppercase' => 'uppercase', 'lowercase' => 'lowercase', 'capitalize' => 'capitalize'], $design->body_text_transform ?? 'capitalize', ['class' => 'form-control']) !!}
         </div>
     </div>
     <div class="col-md-3">
