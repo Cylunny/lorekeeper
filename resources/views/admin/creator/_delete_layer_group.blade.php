@@ -1,5 +1,5 @@
 @if($group)
-    {!! Form::open(['url' => 'admin/data/groups/layergroup/delete/'.$group->id]) !!}
+    {!! Form::open(['url' => 'admin/data/creators/layergroup/delete/'.$group->id]) !!}
 
     <p>You are about to delete the layer group <strong>{{ $group->name }}</strong>. This is not reversible.</p>
     <p>Are you sure you want to delete <strong>{{ $group->name }}</strong>?</p>

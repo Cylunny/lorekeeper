@@ -43,6 +43,7 @@ class CharacterCreatorService extends Service
             if (isset($data['item_id']) && $data['currency_id']) throw new \Exception("You can only set either an item or currency cost!");
             $data['parsed_description'] = parse($data['description']);
             if (!isset($data['is_visible'])) $data['is_visible'] = 0;
+            if (!isset($data['allow_character_creation'])) $data['allow_character_creation'] = 0;
 
             $image = null;
             if (isset($data['image']) && $data['image']) {
@@ -80,6 +81,7 @@ class CharacterCreatorService extends Service
             if (isset($data['item_id']) && $data['currency_id']) throw new \Exception("You can only set either an item or currency cost!");
             $data['parsed_description'] = parse($data['description']);
             if (!isset($data['is_visible'])) $data['is_visible'] = 0;
+            if (!isset($data['allow_character_creation'])) $data['allow_character_creation'] = 0;
 
             $image = null;
             if (isset($data['image']) && $data['image']) {
@@ -122,6 +124,7 @@ class CharacterCreatorService extends Service
         DB::beginTransaction();
 
         try {
+
             foreach ($creator->layerGroups as $group) {
                 $this->deleteLayerGroup($group);
             }
@@ -358,6 +361,7 @@ class CharacterCreatorService extends Service
                 $layer->update();
                 $this->handleImage($image, $layer->imagePath, $layer->imageFileName, null);
             }
+            if($data['type'] == 'lines' && $layer->layerOption->countLineLayers() > 1) throw new \Exception("There can only be one line layer per layer option.");
 
             return $this->commitReturn($layer);
         } catch (\Exception $e) {
@@ -392,15 +396,14 @@ class CharacterCreatorService extends Service
                 $this->handleImage($image, $layer->imagePath, $layer->imageFileName, $old);
             }
 
-            if (isset($data['remove_image'])) {
-                if ($layer && isset($layer->image_extension) && $data['remove_image']) {
-                    $data['image_extension'] = null;
-                    $this->deleteImage($layer->imagePath, $layer->imageFileName);
-                }
-                unset($data['remove_image']);
+            if(!isset($data['delete']) && $data['type'] == 'lines' && $layer->layerOption->countLineLayers() >= 1) throw new \Exception("There can only be one line layer per layer option.");
+
+            if(isset($data['delete'])){
+                $this->deleteLayer($layer);
+            } else {
+                $layer->update($data);
             }
 
-            $layer->update($data);
             return $this->commitReturn($layer);
         } catch (\Exception $e) {
             $this->setError('error', $e->getMessage());
@@ -419,6 +422,7 @@ class CharacterCreatorService extends Service
         DB::beginTransaction();
 
         try {
+            $this->deleteImage($layer->imagePath, $layer->imageFileName);
             $layer->delete();
             return $this->commitReturn(true);
         } catch (\Exception $e) {

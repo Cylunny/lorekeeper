@@ -127,6 +127,10 @@ class LayerGroup extends Model
         foreach($this->layerOptions as $option){
             $select[$option->id] = $option->name;
         }
+        if(!$this->is_mandatory) {
+            $select[0] = 'None'; //add none option of  the group is not mandatory eg wings being optional
+            ksort($select); //sort by id so that none is default
+        }
         return $select;
     }
 

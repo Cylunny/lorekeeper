@@ -137,8 +137,24 @@ class LayerOption extends Model
         foreach($this->layers()->where('type', 'detail')->get() as $layer){
             $select[$layer->id] = $layer->name;
         }
+        if(count($select) > 0) {
+            $select[0] = 'None'; //add no marking option if markings are present
+            ksort($select); //sort by id so that none is default
+        }
         return $select;
     }
 
+    /**
+     * Count line layers.
+     *
+     * @return array
+     */
+    public function countLineLayers(){
+
+        $lineLayers = $this->layers->filter(function($layer) {
+            return $layer->type == 'lines';
+        });
+        return $lineLayers->count();
+    }
 
 }

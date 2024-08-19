@@ -81,7 +81,7 @@ class CharacterCreatorController extends Controller
     {
         $id ? $request->validate(CharacterCreator::$updateRules) : $request->validate(CharacterCreator::$createRules);
         $data = $request->only([
-            'name', 'description', 'parsed_description', 'cost', 'item_id', 'currency_id', 'is_visible', 'image', 'remove_image'
+            'name', 'description', 'parsed_description', 'cost', 'item_id', 'currency_id', 'is_visible', 'image', 'remove_image', 'allow_character_creation'
         ]);
         if ($id && $service->updateCharacterCreator(CharacterCreator::find($id), $data, Auth::user())) {
             flash('CharacterCreator updated successfully.')->success();
@@ -212,12 +212,13 @@ class CharacterCreatorController extends Controller
      */
     public function postDeleteLayerGroup(Request $request, CharacterCreatorService $service, $id)
     {
-        if ($id && $service->deleteCharacterCreator(LayerGroup::find($id))) {
+        $group = LayerGroup::find($id);
+        if ($id && $service->deleteLayerGroup($group)) {
             flash('LayerGroup deleted successfully.')->success();
         } else {
             foreach ($service->errors()->getMessages()['error'] as $error) flash($error)->error();
         }
-        return redirect()->to('admin/data/creators/{{ $id }}');
+        return redirect()->to('admin/data/creators/edit/' . $group->character_creator_id);
     }
 
     /**
@@ -311,7 +312,7 @@ class CharacterCreatorController extends Controller
     {
         $option = LayerOption::find($id);
         return view('admin.creator._delete_layer_option', [
-            'group' => $option,
+            'option' => $option,
         ]);
     }
 
@@ -325,12 +326,13 @@ class CharacterCreatorController extends Controller
      */
     public function postDeleteLayerOption(Request $request, CharacterCreatorService $service, $id)
     {
-        if ($id && $service->deleteCharacterCreator(LayerOption::find($id))) {
+        $option = LayerOption::find($id);
+        if ($id && $service->deleteLayerOption($option)) {
             flash('LayerOption deleted successfully.')->success();
         } else {
             foreach ($service->errors()->getMessages()['error'] as $error) flash($error)->error();
         }
-        return redirect()->to('admin/data/creators/layergroup/{{ $id }}');
+        return redirect()->to('admin/data/creators/layergroup/edit/' . $option->layer_group_id);
     }
 
     /**
@@ -400,7 +402,7 @@ class CharacterCreatorController extends Controller
     {
         $id ? $request->validate(Layer::$updateRules) : $request->validate(Layer::$createRules);
         $data = $request->only([
-            'name', 'image', 'type'
+            'name', 'image', 'type', 'delete'
         ]);
         if (str_contains($request->getPathInfo(), 'edit') && $service->updateLayer(Layer::find($id), $data)) {
             flash('Layer updated successfully.')->success();

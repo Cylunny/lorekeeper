@@ -15,7 +15,7 @@ class CharacterCreator extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'description', 'parsed_description', 'cost', 'item_id', 'currency_id', 'is_visible', 'image_extension'
+        'name', 'description', 'parsed_description', 'cost', 'item_id', 'currency_id', 'is_visible', 'image_extension', 'allow_character_creation'
     ];
 
     /**

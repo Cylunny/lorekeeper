@@ -78,6 +78,12 @@
             {!! Form::label('is_visible', 'Is Viewable', ['class' => 'form-check-label ml-3']) !!} {!! add_help('If this is turned off, the creator will not be visible.') !!}
         </div>
     </div>
+    <div class="col-md">
+        <div class="form-group">
+            {!! Form::checkbox('allow_character_creation', 1, $creator->id ? $creator->allow_character_creation : 1, ['class' => 'form-check-input', 'data-toggle' => 'toggle']) !!}
+            {!! Form::label('allow_character_creation', 'Allow Character Creation', ['class' => 'form-check-label ml-3']) !!} {!! add_help('If this is turned off, members cannot turn the result into a character. Use this to showcase traits dynamically or something.') !!}
+        </div>
+    </div>
 </div>
 
 <div class="text-right">

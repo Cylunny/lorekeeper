@@ -4,6 +4,11 @@
 
 @section('content')
 <h1>{{ $creator->name }}</h1>
+@if($creator->allow_character_creation && $creator->cost > 0)
+<p>Creating a character will cost you {{ $creator->cost }} {!! isset($creator->currency) ? $creator->currency->displayName : $creator->item->displayName !!} once you are done designing. Playing around with it is free.</b></i></p> 
+@else
+You can use this creator to make a character for free!
+@endif
 
 <!--- The main "image" stacked together, without input we always show the first layer of each group.--->
 <div class="row">
@@ -28,7 +33,7 @@
     </div>
 
     <!--- Menu! --->
-    @if(Settings::get('creator_sort_by_group'))
+    @if(Settings::get('creator_sort_by_group') && Settings::get('creator_sort_by_group') == 1)
     <div class="col-lg-5 col-12">
         <div class="card w-100 h-100">
             <div class="card-header">
@@ -79,13 +84,7 @@
                 </div>
             </div>
             @endforeach
-            </div>
-            <div class="card-footer text-muted">
-                @if($creator->cost > 0) <i>This will create the character and remove the payment from your account!</i> @endif
-                <a href="#" class="btn btn-warning float-right delete-creator-button">Create Character</a>
-            </div>
-        </div>
-    </div>
+
 
     @else 
 
@@ -146,14 +145,19 @@
                     @endforeach
                 </div>
             </div>
-            <div class="card-footer text-muted">
-                @if($creator->cost > 0) <i>This will create the character and remove the payment from your account!</i> @endif
+
+    @endif
+        @if($creator->allow_character_creation == 1)
+            <div class="card-footer text-muted text-right">
+                @if($creator->cost > 0) 
+                <p><i>This will create the character and <b>remove {{ $creator->cost }} {!! isset($creator->currency) ? $creator->currency->displayName : $creator->item->displayName !!} from your account!</b></i></p> 
+                @endif
                 <a href="#" class="btn btn-warning float-right delete-creator-button">Create Character</a>
             </div>
+        @endif
         </div>
     </div>
 
-    @endif
 </div>
 
 

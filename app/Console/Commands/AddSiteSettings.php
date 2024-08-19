@@ -103,6 +103,8 @@ class AddSiteSettings extends Command
 
         $this->addSiteSetting('group_currency', 1, 'ID of the group currency to award from gallery submissions (if enabled).');
 
+        $this->addSiteSetting('creator_sort_by_group', 0, 'Changes how the menu of the character creator is displayed. 0 = base and color, 1 = each layer group has a tab.');
+
         $this->line("\nSite settings up to date!");
 
     }
