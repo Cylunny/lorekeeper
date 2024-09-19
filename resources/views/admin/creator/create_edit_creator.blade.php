@@ -54,12 +54,12 @@
         </div>
         @endif
         <div class="col">
-            {!! Form::label('Image (Optional)') !!} {!! add_help('This image is used on the creator page as a header, as well as the index.') !!}
+            {!! Form::label('Image (Optional)') !!} {!! add_help('This image is used on the creator page as a header image, as well as on the index.') !!}
             <div>{!! Form::file('image') !!}</div>
             <div class="text-muted">Recommended size: None (Choose a standard size for all character creator images.)</div>
             @if(isset($creator->image_extension))
             <div class="form-check">
-                {!! Form::checkbox('remove_image', 1, false, ['class' => 'form-check-input', 'data-toggle' => 'toggle', 'data-off' => 'Leave Header Image As-Is', 'data-on' => 'Remove Current Header Image']) !!}
+                {!! Form::checkbox('remove_image', 1, false, ['class' => 'form-check-input', 'data-toggle' => 'toggle', 'data-off' => 'Leave Image As-Is', 'data-on' => 'Remove Current Image']) !!}
             </div>
             @endif
         </div>
@@ -109,6 +109,7 @@
         <tr>
             <th>Name</th>
             <th>Mandatory</th>
+            <th>Sort</th>
             <th></th>
         </tr>
     </thead>
@@ -121,6 +122,9 @@
             </td>
             <td>
                 {{ $group->is_mandatory ? 'Yes' : 'No' }}
+            </td>
+            <td>
+                {{ $group->sort }}
             </td>
             <td class="text-right">
                 <a href="{{ url('admin/data/creators/layergroup/edit/'.$group->id) }}" class="btn btn-primary">Edit</a>

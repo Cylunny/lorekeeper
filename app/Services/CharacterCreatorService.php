@@ -95,7 +95,7 @@ class CharacterCreatorService extends Service
                 $creator->update();
                 $this->handleImage($image, $creator->imagePath, $creator->imageFileName, $old);
             }
-
+            
             if (isset($data['remove_image'])) {
                 if ($creator && isset($creator->image_extension) && $data['remove_image']) {
                     $data['image_extension'] = null;
@@ -156,6 +156,11 @@ class CharacterCreatorService extends Service
             $data['parsed_description'] = parse($data['description']);
             $data['character_creator_id'] = $creatorId;
             if (!isset($data['is_mandatory'])) $data['is_mandatory'] = 0;
+
+            //set sort to next highest or else we may run intro trouble later if sort 0 is given twice
+            $creator = CharacterCreator::find($creatorId);
+            $data['sort'] = $creator->layerGroups()->count();
+
             $group = LayerGroup::create($data);
             return $this->commitReturn($group);
         } catch (\Exception $e) {
@@ -252,6 +257,11 @@ class CharacterCreatorService extends Service
         try {
             $data['parsed_description'] = parse($data['description']);
             $data['layer_group_id'] = $groupId;
+
+            //set sort to next highest or else we may run intro trouble later if sort 0 is given twice
+            $group = LayerGroup::find($groupId);
+            $data['sort'] = $group->layerOptions()->count();
+
             $option = LayerOption::create($data);
             return $this->commitReturn($option);
         } catch (\Exception $e) {
@@ -352,7 +362,12 @@ class CharacterCreatorService extends Service
                 unset($data['image']);
             }
             // temp name in case none was given
-            if(!isset($data['name'])) $data['name'] = "tempname";
+            if(!isset($data['name'])) $data['name'] = "unnamed";
+
+            //set sort to next highest or else we may run intro trouble later if sort 0 is given twice
+            $option = LayerOption::find($optionId);
+            $data['sort'] = $option->layers()->count();
+
             $layer = Layer::create($data);
 
             if ($image) {
@@ -396,7 +411,9 @@ class CharacterCreatorService extends Service
                 $this->handleImage($image, $layer->imagePath, $layer->imageFileName, $old);
             }
 
-            if(!isset($data['delete']) && $data['type'] == 'lines' && $layer->layerOption->countLineLayers() >= 1) throw new \Exception("There can only be one line layer per layer option.");
+            if(!isset($data['delete']) && $data['type'] == 'lines' && $layer->layerOption->countLineLayers() >= 1){
+                throw new \Exception("There can only be one line layer per layer option.");
+            } 
 
             if(isset($data['delete'])){
                 $this->deleteLayer($layer);

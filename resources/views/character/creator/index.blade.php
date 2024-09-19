@@ -6,19 +6,18 @@
 <h1>Character Creators</h1>
 
 <div class="row">
-    <div class="col-4">
-        <h5>Existing</h5>
-        <img class="w-100 bg-dark" src="data:image/png;base64, {{ $image }}"/>
-    </div>
-    <div class="col-4">
-        <h5>Colored</h5>
-        <img class="w-100 bg-dark" src="{{ $colored_image }}"/>
-    </div>
-    <div class="col-4">
-        <h5>Merged</h5>
-        <img class="w-100 bg-dark" src="{{ $merged_image }}"/>
-    </div>
+    @foreach($creators as $creator)
+        <div class="col-md-3 col-6 mb-3 text-center">
+            <div class="">
+                <a href="{{ $creator->url }}"><img src="{{ $creator->imageUrl }}" alt="{{ $creator->name }}" style="max-width:300px;" /></a>
+            </div>
+            <div class="mt-1">
+                <a href="{{ $creator->url }}" class="h5 mb-0">{{ $creator->name }}</a>
+            </div>
+        </div>
+    @endforeach
 </div>
+
 
 @endsection
 

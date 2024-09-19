@@ -56,6 +56,7 @@
     <thead>
         <tr>
             <th>Name</th>
+            <th>Sort</th>
             <th></th>
         </tr>
     </thead>
@@ -65,6 +66,9 @@
             <td>
                 <a class="fas fa-arrows-alt-v handle mr-3" href="#"></a>
                 {{ $option->name }}
+            </td>
+            <td>
+                {{ $option->sort }}
             </td>
             <td class="text-right">
                 <a href="{{ url('admin/data/creators/layeroption/edit/'.$option->id) }}" class="btn btn-primary">Edit</a>

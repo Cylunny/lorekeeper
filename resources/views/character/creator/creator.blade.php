@@ -4,21 +4,20 @@
 
 @section('content')
 <h1>{{ $creator->name }}</h1>
-@if($creator->allow_character_creation && $creator->cost > 0)
-<p>Creating a character will cost you {{ $creator->cost }} {!! isset($creator->currency) ? $creator->currency->displayName : $creator->item->displayName !!} once you are done designing. Playing around with it is free.</b></i></p> 
-@else
-You can use this creator to make a character for free!
-@endif
+<div class="parsed-text">
+    {!! $creator->parsed_description !!}
+</div>
+
 
 <!--- The main "image" stacked together, without input we always show the first layer of each group.--->
-<div class="row">
+<div class="row" id="creator">
 
     <!--- Layered Images! --->
-    <div class="col-lg-7 col-12 bg-secondary rounded">
+    <div class="col-lg-7 col-12 rounded" style="background-color:grey;">
         <div id="creator-container" class="creator-container">
             @php $isBaseSet = false; @endphp
             @foreach($creator->layerGroups()->orderBy('sort', 'ASC')->get() as $group)
-                @if($group->layerOptions()->count() > 0)
+                @if($group->layerOptions()->count() > 0 && $group->is_mandatory)
                     @foreach($group->layerOptions[0]->layers()->orderBy('sort', 'ASC')->get() as $layer)
                         @if(!$isBaseSet)
                             <img src="{{ $layer->imageUrl }}" class="creator-base" style="max-width:100%;" data-id="{{ $layer->id }}"/>
@@ -34,129 +33,11 @@ You can use this creator to make a character for free!
 
     <!--- Menu! --->
     @if(Settings::get('creator_sort_by_group') && Settings::get('creator_sort_by_group') == 1)
-    <div class="col-lg-5 col-12">
-        <div class="card w-100 h-100">
-            <div class="card-header">
-                <ul class="nav nav-tabs card-header-tabs">
-                    @foreach($creator->layerGroups()->orderBy('sort', 'DESC')->get() as $group)
-                    <li class="nav-item">
-                        <a class="nav-link {{ ($loop->index == 0) ? 'active' : '' }}" id="group-nav-{{ $group->id }}" data-toggle="tab" href="#group-{{ $group->id }}" role="tab">{{ $group->name }}</a>
-                    </li>
-                    @endforeach
-                </ul>
-            </div>
-            <div class="card-body tab-content">
-            @foreach($creator->layerGroups()->orderBy('sort', 'DESC')->get() as $group)
-            <div class="tab-pane fade {{ ($loop->index == 0) ? 'show active' : '' }}" id="group-{{ $group->id }}">
-                <h3>{{ $group->name }}</h3>
-                Base <i>(Changing the base will reset colors!)</i>
-                <div class="form-group">
-                    {!! Form::select($group->id .'_option', $group->getOptionSelect(), null, ['class' => 'form-control creator-select base-select']) !!}
-                </div>
-                @php $option = $group->layerOptions()->first(); @endphp
-
-                <div id="{{ $group->id . '_choices' }}">
-                    @foreach($option->layers()->where('type', 'color')->get() as $colorlayer)
-                        <div class="form-group">
-                            <div class="input-group cp">
-                                {!! Form::text($group->id . '_' . $colorlayer->id .'_color', '#ffffff', ['class' => 'form-control creator-colorpicker']) !!}
-                                <span class="input-group-append">
-                                    <span class="input-group-text colorpicker-input-addon"><i></i></span>
-                                </span>
-                            </div>
-                        </div>
-                    @endforeach
-
-                    @if(count($option->getMarkingSelect()) > 0)
-                        Markings
-                        <div class="form-group">
-                            {!! Form::select($group->id . '_marking', $option->getMarkingSelect(), null, ['class' => 'form-control creator-select']) !!}
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group cp">
-                                    {!! Form::text($group->id .'_markingcolor', '#ffffff', ['class' => 'form-control creator-colorpicker']) !!}
-                                    <span class="input-group-append">
-                                        <span class="input-group-text colorpicker-input-addon"><i></i></span>
-                                    </span>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
-            @endforeach
-
-
+        @include('character.creator._menu_by_group')
     @else 
-
-    <div class="col-lg-5 col-12">
-        <div class="card w-100 h-100">
-            <div class="card-header">
-                <ul class="nav nav-tabs card-header-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="nav-base" data-toggle="tab" href="#base-tab" role="tab">Base</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="nav-color" data-toggle="tab" href="#color-tab" role="tab">Color</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body tab-content">
-                <div class="tab-pane fade show active" id="base-tab">
-                    @foreach($creator->layerGroups()->orderBy('sort', 'DESC')->get() as $group)
-                    <h5>{{ $group->name }}</h5>
-                    <div class="form-group">
-                        {!! Form::select($group->id .'_option', $group->getOptionSelect(), null, ['class' => 'form-control creator-select base-select']) !!}
-                    </div>
-                    @endforeach
-                </div>
-                <div class="tab-pane fade" id="color-tab">
-                    @foreach($creator->layerGroups()->orderBy('sort', 'DESC')->get() as $group)
-
-                    <h5>{{ $group->name }}</h5>
-                    @php $option = $group->layerOptions()->first(); @endphp
-
-                    <div id="{{ $group->id . '_choices' }}">
-                        @foreach($option->layers()->where('type', 'color')->get() as $colorlayer)
-                            <div class="form-group">
-                                <div class="input-group cp">
-                                    {!! Form::text($group->id . '_' . $colorlayer->id .'_color', '#ffffff', ['class' => 'form-control creator-colorpicker']) !!}
-                                    <span class="input-group-append">
-                                        <span class="input-group-text colorpicker-input-addon"><i></i></span>
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
-
-                        @if(count($option->getMarkingSelect()) > 0)
-                            Markings
-                            <div class="form-group">
-                                {!! Form::select($group->id . '_marking', $option->getMarkingSelect(), null, ['class' => 'form-control creator-select']) !!}
-                            </div>
-                            <div class="form-group">
-                                <div class="input-group cp">
-                                        {!! Form::text($group->id .'_markingcolor', '#ffffff', ['class' => 'form-control creator-colorpicker']) !!}
-                                        <span class="input-group-append">
-                                            <span class="input-group-text colorpicker-input-addon"><i></i></span>
-                                        </span>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
+        @include('character.creator._menu_by_type')
     @endif
-        @if($creator->allow_character_creation == 1)
-            <div class="card-footer text-muted text-right">
-                @if($creator->cost > 0) 
-                <p><i>This will create the character and <b>remove {{ $creator->cost }} {!! isset($creator->currency) ? $creator->currency->displayName : $creator->item->displayName !!} from your account!</b></i></p> 
-                @endif
-                <a href="#" class="btn btn-warning float-right delete-creator-button">Create Character</a>
-            </div>
-        @endif
-        </div>
-    </div>
+
 
 </div>
 
@@ -166,5 +47,10 @@ You can use this creator to make a character for free!
 
 @section('scripts')
 @include('character.creator._creator_js')
-
+<script>
+    $('.create-character-button').on('click', function(e) {
+        e.preventDefault();
+        loadModal("{{ url('character-creator') }}/{{ $creator->id }}/create", 'Create Character');
+    });
+</script>
 @endsection

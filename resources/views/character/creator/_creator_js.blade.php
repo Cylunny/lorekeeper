@@ -42,27 +42,30 @@
             dataType: "html",
             data: data,
         }).done(function(res) {
-            $("#creator-container").html(res);
+            $("#creator-container").html(res);            
             $('.cp').colorpicker();
         }).fail(function(jqXHR, textStatus, errorThrown) {
             alert("AJAX call failed: " + textStatus + ", " + errorThrown);
         });
 
-        // update the choices
-        if ($(evt.target).is('select') && $(evt.target).hasClass('base-select')) {
-            var optionId = $(evt.target).find(":selected").val();
-            var groupId = $(evt.target).attr("name").split('_')[0];
+        if(evt) {
+         // update the choices
+            if ($(evt.target).is('select') && $(evt.target).hasClass('base-select')) {
+                var optionId = $(evt.target).find(":selected").val();
+                var groupId = $(evt.target).attr("name").split('_')[0];
 
-            $.ajax({
-                type: "GET",
-                url: "{{ url('character-creator/choices') }}?groupId=" + groupId + "&optionId=" + optionId,
-                dataType: "text"
-            }).done(function(res) {
-                $("#" + groupId + "_choices").html(res);
-            }).fail(function(jqXHR, textStatus, errorThrown) {
-                alert("AJAX call failed: " + textStatus + ", " + errorThrown);
-            });
+                $.ajax({
+                    type: "GET",
+                    url: "{{ url('character-creator/choices') }}?groupId=" + groupId + "&optionId=" + optionId,
+                    dataType: "text"
+                }).done(function(res) {
+                    $("#" + groupId + "_choices").html(res);
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    alert("AJAX call failed: " + textStatus + ", " + errorThrown);
+                });
+            }
         }
+        
 
 
     }

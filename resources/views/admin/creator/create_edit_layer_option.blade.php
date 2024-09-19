@@ -61,6 +61,7 @@
                 <th>Name</th>
                 <th>Type</th>
                 <th>Image</th>
+                <th>Sort</th>
                 <th></th>
             </tr>
         </thead>
@@ -79,6 +80,9 @@
                     <a href="{{ $layer->imageUrl }}" data-lightbox="entry" data-title="{{ $layer->name }}">
                         <img src="{{ $layer->imageUrl }}" class="bg-secondary rounded image" style="max-height:100px;" data-toggle="tooltip" title="Click to view larger size" alt="{{ $layer->name }}" />
                     </a>
+                </td>
+                <td>
+                    {{ $layer->sort }}
                 </td>
                 <td class="text-right">
                     <a href="#" data-id="{{$layer->id}}" class="btn btn-primary edit-layer">Edit</a>

@@ -63,7 +63,7 @@
                                 Design Approvals
                             </a>
                             <a class="dropdown-item" href="{{ url('character-creator') }}">
-                               Character Creator
+                               Character Creators
                             </a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{{ url('characters/transfers/incoming') }}">

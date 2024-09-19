@@ -83,10 +83,12 @@ class CharacterCreatorController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function getImage($id, Request $request, CharacterCreatorManager $service,)
+    public function getImage($id, Request $request, CharacterCreatorManager $service)
     {
         $creator = CharacterCreator::where('id', $id)->visible()->first();
-        if(!$creator) abort(404);
+        if(!$creator) {
+            abort(404);
+        }
         return view('character.creator._image', [
             'b64Images' => $service->getImages($creator, $request),
         ]);
@@ -107,6 +109,51 @@ class CharacterCreatorController extends Controller
             'group' => LayerGroup::find($groupId),
             'option' => LayerOption::find($optionId)
         ]);
+    }
+
+    /**
+     * Gets the create character modal.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getCreateCharacter($id)
+    {
+        $creator = CharacterCreator::where('id', $id)->visible()->first();
+        $user = Auth::user();
+        if(!$creator->allow_character_creation){
+            flash('Character creation is disabled for this creator.')->warning();
+            return redirect()->back();        
+        }
+        if(!$user){
+            flash('You must be logged in to create a character.')->error();
+            return redirect()->back();        
+        }
+        return view('character.creator._create_character_modal', [
+            'creator' => $creator,
+        ]);
+    }
+
+    /**
+     * Creates a new character from what the user did, if the user is logged in and the
+     * Creator allows for character creation.
+     * @param  Request  $request
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function postCreateCharacter($id, Request $request, CharacterCreatorManager $service){
+        $creator = CharacterCreator::where('id', $id)->visible()->first();
+        $user = Auth::user();
+        if ($image = $service->createCharacter($creator, $request, $user)) {
+            return view('character.creator.download', [
+                'image' => $image,
+                'creator' => $creator,
+                'creators' => CharacterCreator::visible()->get()
+            ]);
+        } else {
+            $error = $service->errors()->getMessages()['error'][0];
+            //yes we are eating the rest of the errors woopiedoo.
+            return "<span class='alert alert-danger w-100'>". $error . " Please return and try again. If the issue persists, contact a site admin.</span>";
+        }
     }
 
 }
