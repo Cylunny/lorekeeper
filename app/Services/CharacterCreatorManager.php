@@ -47,7 +47,7 @@ class CharacterCreatorManager extends Service
         $images = [];
         $choicesByGroup = [];
         // build nestled array for easy request data access
-        foreach ($request->all() as $key => $value) {
+        foreach ($request->except('_token', 'changed') as $key => $value) {
             $split = explode("_", $key);
             $groupId = $split[0];
             $selectionType = $split[1];
@@ -66,6 +66,13 @@ class CharacterCreatorManager extends Service
 
         //sort by key to keep layer order
         ksort($choicesByGroup);
+
+
+        //TODO: only change the image we need and send it back alone with the layer id.
+        // in the creator.js we need to then get the id and replace the image with the same layer id instead of all of them.
+        
+        Log::info($choicesByGroup);
+        Log::info($request['changed']);
 
         //go over the layer choices and build the base64 images
         foreach ($choicesByGroup as $sort => $choices) {

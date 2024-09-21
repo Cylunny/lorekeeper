@@ -26,6 +26,7 @@
         // update the image stack
         var data = {
             "_token": "{{ csrf_token() }}",
+            "changed": evt.target.name
         };
         $(".form-control").each(function(index, element) {
             var name = $(this).attr("name");

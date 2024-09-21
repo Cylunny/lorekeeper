@@ -372,7 +372,7 @@ class CharacterCreatorService extends Service
 
             if ($image) {
                 $layer->image_extension = uniqid('', true) .'.' . $image->getClientOriginalExtension();
-                if($data['name'] == "tempname") $layer->name = $image->getClientOriginalName();
+                if($data['name'] == "unnamed") $layer->name = $image->getClientOriginalName();
                 $layer->update();
                 $this->handleImage($image, $layer->imagePath, $layer->imageFileName, null);
             }
@@ -439,7 +439,11 @@ class CharacterCreatorService extends Service
         DB::beginTransaction();
 
         try {
-            $this->deleteImage($layer->imagePath, $layer->imageFileName);
+            try {
+                $this->deleteImage($layer->imagePath, $layer->imageFileName);
+            }catch (\Exception $e) {
+                //ignore it we delete...
+            }
             $layer->delete();
             return $this->commitReturn(true);
         } catch (\Exception $e) {
