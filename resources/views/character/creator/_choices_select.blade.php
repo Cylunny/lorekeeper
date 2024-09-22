@@ -26,4 +26,6 @@
             </div>
         </div>
     @endif
+@else
+<div class="p-2">No Option selected.</div>
 @endif

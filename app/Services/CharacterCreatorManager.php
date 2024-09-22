@@ -4,6 +4,7 @@ namespace App\Services;
 
 use DB;
 use Carbon\Carbon;
+use Session;
 
 use App\Services\CurrencyManager;
 use App\Services\InventoryManager;
@@ -44,73 +45,96 @@ class CharacterCreatorManager extends Service
      */
     public function getImages($creator, $request)
     {
-        $images = [];
+
+        $reload = $request['reload'];
+        $changed = [];
+        $previous = Session::get('previous_creator');
+
+        if($previous) {
+            // get the groups that actually changed
+            foreach ($request->except('_token', 'reload') as $key => $value) {
+                if(isset($previous[$key]) && $previous[$key] != $value){
+                    // a change!
+                    Log::info("A CHANGE");
+                    $changed[] = $split = explode("_", $key)[0];
+                }
+            }
+        }
+
         $choicesByGroup = [];
         // build nestled array for easy request data access
-        foreach ($request->except('_token', 'changed') as $key => $value) {
+        foreach ($request->except('_token', 'reload') as $key => $value) {
             $split = explode("_", $key);
             $groupId = $split[0];
-            $selectionType = $split[1];
-            $group = LayerGroup::find($groupId);
 
-            if(isset($group)){
-                $sort = $group->sort;
-                $choicesByGroup[$sort]['groupId'] = $groupId;
-                if ($selectionType == 'option') $choicesByGroup[$sort]['option'] = $value;
-                if ($selectionType == 'marking') $choicesByGroup[$sort]['marking'] = $value;
-                if ($selectionType == 'markingcolor') $choicesByGroup[$sort]['markingcolor'] = $value;
-                if (is_numeric($selectionType)) $choicesByGroup[$sort]['colorlayers'][$selectionType] = $value;
+            //only add groups that changed for updated images
+            if($reload == true || count($changed) <= 0 || in_array($groupId, $changed)){
+                $selectionType = $split[1];
+                $group = LayerGroup::find($groupId);
+
+                if(isset($group)){
+                    $sort = $group->sort;
+                    $choicesByGroup[$sort]['groupId'] = $groupId;
+                    if ($selectionType == 'option') $choicesByGroup[$sort]['option'] = $value;
+                    if ($selectionType == 'marking') $choicesByGroup[$sort]['marking'] = $value;
+                    if ($selectionType == 'markingcolor') $choicesByGroup[$sort]['markingcolor'] = $value;
+                    if (is_numeric($selectionType)) $choicesByGroup[$sort]['colorlayers'][$selectionType] = $value;
+                }
             }
-
         };
 
         //sort by key to keep layer order
         ksort($choicesByGroup);
-
-
-        //TODO: only change the image we need and send it back alone with the layer id.
-        // in the creator.js we need to then get the id and replace the image with the same layer id instead of all of them.
         
-        Log::info($choicesByGroup);
-        Log::info($request['changed']);
-
+        $images = [];
         //go over the layer choices and build the base64 images
         foreach ($choicesByGroup as $sort => $choices) {
-
+            $merge = [];
             $option = LayerOption::find($choices['option']);
-            
             if($option != null){
 
+                // sort color layers and only include those matching the option
                 if(isset($choices['colorlayers'])){
-                    // sort color layers and only include those matching the option
                     $colorLayers = array_intersect_key($choices['colorlayers'], array_flip($option->layers()->pluck('id')->toArray()));
-
-                    // if color layers is empty...we add the base layer only.
-                    if(count($colorLayers) <= 0){
-                        $colorUrl = $this->colorize($option->baseImageFilePath, '#FFFFFF');
-                        $images[] = $colorUrl;
-                    }
-                    // get color layers
-                    foreach ($colorLayers as $layerId => $color) {
-                        $colorLayer = Layer::find($layerId);
-                        $colorUrl = $this->colorize($colorLayer->imageFilePath, $color);
-                        $images[] = $colorUrl;
-                    }
+                } else {
+                    $colorLayers = [];
                 }
 
+                // color the color layers
+                foreach ($option->layers as $layer) {
+                    if($layer->type == 'color'){
+                        $color = $colorLayers[$layer->id] ?? '#FFFFFF';
+                        $colorUrl = $this->colorize($layer->imageFilePath, $color);
+                        $merge[] = $colorUrl;
+                    }
+                }
+                
                 // get marking layer and color it then turn it into a b64 image url
                 if(isset($choices['marking']) && $option->layers()->pluck('id')->contains($choices['marking'])){
                     $markingLayer = Layer::find($choices['marking']);
                     $markingUrl = $this->colorize($markingLayer->imageFilePath, $choices['markingcolor']);
-                    $images[] = $markingUrl;
+                    $merge[] = $markingUrl;
+
                 }
                 // get line image url
-                $lineImageUrl = $option->lineImageUrl;
-                $images[] = $lineImageUrl;
+                $merge[] = $option->lineImageUrl;
+                //merge option image
+                $merged = Image::make($merge[0]);
+                foreach($merge as $i => $image){
+                    $merged = $merged->insert($image);
+                }
+                $merged->encode('data-url');
+                $images[$choices['groupId']] = $merged;
+            } else {
+                //remove an image by hiding it
+                $images[$choices['groupId']] = null;
             }
+                
         }
+        Session::put('previous_creator', $request->all());
         return $images;
     }
+
 
     /**
      * Turns the images into one and creates a character design update request based on it.
@@ -145,7 +169,6 @@ class CharacterCreatorManager extends Service
             $this->commitReturn(true);
             return $merged;
         } catch(\Exception $e) {
-            Log::error($e);
             $this->setError('error', $e->getMessage());
         }
         return $this->rollbackReturn(false);

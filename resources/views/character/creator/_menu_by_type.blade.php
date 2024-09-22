@@ -13,14 +13,19 @@
             </div>
             <div class="card-body tab-content">
                 <div class="tab-pane fade show active" id="base-tab">
+                    <i>Changing the base will reset colors of the changed element!</i>
+                    <hr>
                     @foreach($creator->layerGroups()->orderBy('sort', 'DESC')->get() as $group)
                     <h5>{{ $group->name }}</h5>
+
                     <div class="form-group">
                         {!! Form::select($group->id .'_option', $group->getOptionSelect(), null, ['class' => 'form-control creator-select base-select']) !!}
                     </div>
                     @endforeach
                 </div>
                 <div class="tab-pane fade" id="color-tab">
+                    <i>Changing colors may take a bit, please wait until one change is visible to do the next one!</i>
+                    <hr>
                     @foreach($creator->layerGroups()->orderBy('sort', 'DESC')->get() as $group)
                         @php $option = $group->layerOptions()->first(); @endphp
                         @if($option->layers()->where('type', 'color')->count() > 0)
@@ -42,7 +47,7 @@
                                     Markings
                                     <div class="row">
                                         <div class="form-group col-xl-6 col-12">
-                                            {!! Form::select($group->id . '_marking', $option->getMarkingSelect(), null, ['class' => 'form-control creator-select']) !!}
+                                            {!! Form::select($group->id . '_marking', $option->getMarkingSelect(), null, ['class' => 'form-control marking-select']) !!}
                                         </div>
                                         <div class="form-group col-xl-6 col-12">
                                             <div class="input-group cp">

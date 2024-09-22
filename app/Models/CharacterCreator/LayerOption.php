@@ -105,6 +105,24 @@ class LayerOption extends Model
         return $base->imageFilePath ?? null;
     }
 
+    /**
+     * Get the base layer.
+     *
+     * @return Image
+     */
+    public function getBaseLayerAttribute(){
+        return $this->layers()->where('type', 'color')->orderBy('sort')->first() ?? null;
+    }
+
+    /**
+     * Get the line layer.
+     *
+     * @return Image
+     */
+    public function getLineLayerAttribute(){
+        return $this->layers()->where('type', 'lines')->first() ?? null;
+    }
+
     /**********************************************************************************************
 
         OTHER FUNCTIONS

@@ -1,13 +1,16 @@
-@if($creator->cost > 0) 
-    <p>This will create a final PNG of your character for you to download, and <b>remove {{ $creator->cost }} {!! isset($creator->currency) ? $creator->currency->displayName : $creator->item->displayName !!} from your account.</b></p> 
+@if(!$creator->allow_character_creation || !$user)
+<p> Character creation is disabled for this creator, or you are not logged in. </p>      
 @else
-    <p>This will create a final PNG of your character for you to download.</b></p> 
+    @if($creator->cost > 0) 
+        <p>This will create a final PNG of your character for you to download, and <b>remove {{ $creator->cost }} {!! isset($creator->currency) ? $creator->currency->displayName : $creator->item->displayName !!} from your account.</b></p> 
+    @else
+        <p>This will create a final PNG of your character for you to download.</b></p> 
+    @endif
+
+    <p>Are you sure you want to do this? <b>This might take a while to load due to image manipulations.</b></p>
+
+    <a href="#" class="btn btn-success float-right confirm-create-character-button">Create Character</a>
 @endif
-
-<p>Are you sure you want to do this? <b>This might take a while to load due to image manipulations.</b></p>
-
-<a href="#" class="btn btn-success float-right confirm-create-character-button">Create Character</a>
-
 
 <script>
     

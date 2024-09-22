@@ -101,16 +101,10 @@ class CharacterCreatorController extends Controller
     {
         $creator = CharacterCreator::where('id', $id)->visible()->first();
         $user = Auth::user();
-        if(!$creator->allow_character_creation){
-            flash('Character creation is disabled for this creator.')->warning();
-            return redirect()->back();        
-        }
-        if(!$user){
-            flash('You must be logged in to create a character.')->error();
-            return redirect()->back();        
-        }
+        
         return view('character.creator._create_character_modal', [
             'creator' => $creator,
+            'user' => $user
         ]);
     }
 

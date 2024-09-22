@@ -1,4 +1,6 @@
 <script>
+
+    // we want the colorpicker to only send when the lil window closes...
     var deletionObserver = new MutationObserver(
         function(mutations) {
             mutations.forEach(
@@ -6,7 +8,7 @@
                     mutation.removedNodes.forEach(
                         function(node) {
                             if (node.classList && node.classList.contains('colorpicker-bs-popover')) {
-                                updatePreview();
+                                updatePreview(node);
                             }
                         });
                 });
@@ -17,21 +19,55 @@
         subtree: true
     });
 
+    $(document).ready(function() {
+        //also update the selections manually once..
+        $('.creator-select').each(function(i, obj) {
+            var optionId = $(obj).find(":selected").val();
+            var groupId = $(obj).attr("name").split('_')[0];
+
+            $.ajax({
+                type: "GET",
+                url: "{{ url('character-creator/choices') }}?groupId=" + groupId + "&optionId=" + optionId,
+                dataType: "text"
+            }).done(function(res) {
+                $("#" + groupId + "_choices").html(res);
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                alert("AJAX call failed: " + textStatus + ", " + errorThrown);
+            });
+        });
+        $('.cp').colorpicker();
+        //send request to start with..this should only run on page reload        
+        updatePreview();
+
+    });
+
     $(document).on('change', '.creator-select', function(evt) {
+        //then only send if user changes smth
+        updatePreview(evt);
+    });
+
+    $(document).on('change', '.marking-select', function(evt) {
+        //then only send if user changes smth
+        updatePreview(evt);
+    });
+
+    
+    $(document).on('blur', '.colorpicker-element', function(evt) {
+        //then only send if user changes smth
         updatePreview(evt);
     });
 
     function updatePreview(evt) {
-
         // update the image stack
         var data = {
             "_token": "{{ csrf_token() }}",
-            "changed": evt.target.name
+            "reload": evt == null ? 1 : 0
         };
         $(".form-control").each(function(index, element) {
             var name = $(this).attr("name");
             if ($(this).is('input')) {
-                data[name] = $(this).val();
+                if(evt) data[name] = $(this).val();
+                else data[name] = "#FFFFFF";
             }
             if ($(this).is('select')) {
                 data[name] = $(this).find(":selected").val();
@@ -43,7 +79,13 @@
             dataType: "html",
             data: data,
         }).done(function(res) {
-            $("#creator-container").html(res);            
+            //$("#creator-container").html(res);  
+            $(res).each(function(i, obj) {
+                //replace images with new ones OR add new ones
+                if(obj.id){
+                     $("#" + obj.id).html(obj); 
+                }
+            });       
             $('.cp').colorpicker();
         }).fail(function(jqXHR, textStatus, errorThrown) {
             alert("AJAX call failed: " + textStatus + ", " + errorThrown);
@@ -66,8 +108,5 @@
                 });
             }
         }
-        
-
-
     }
 </script>

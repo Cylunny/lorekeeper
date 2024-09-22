@@ -15,28 +15,16 @@
     <!--- Layered Images! --->
     <div class="col-lg-7 col-12 rounded" style="background-color:grey;">
         <div id="creator-container" class="creator-container">
-            @php $isBaseSet = false; @endphp
             @foreach($creator->layerGroups()->orderBy('sort', 'ASC')->get() as $group)
-                @if($group->layerOptions()->count() > 0 && $group->is_mandatory)
-                    @foreach($group->layerOptions[0]->layers()->orderBy('sort', 'ASC')->get() as $layer)
-                        @if(!$isBaseSet)
-                            <img src="{{ $layer->imageUrl }}" class="creator-base" style="max-width:100%;" data-id="{{ $layer->id }}"/>
-                            @php $isBaseSet = true; @endphp
-                        @else
-                            <img src="{{ $layer->imageUrl }}" class="creator-layer" style="max-width:100%;" data-id="{{ $layer->id }}"/>
-                        @endif
-                    @endforeach
-                @endif
+                <div id="group-{{ $group->id }}"><img src="#" class="creator-layer hide" style="max-width:100%;"/></div>
             @endforeach
         </div>
     </div>
 
     <!--- Menu! --->
-    @if(Settings::get('creator_sort_by_group') && Settings::get('creator_sort_by_group') == 1)
-        @include('character.creator._menu_by_group')
-    @else 
-        @include('character.creator._menu_by_type')
-    @endif
+
+    @include('character.creator._menu_by_type')
+
 
 
 </div>
