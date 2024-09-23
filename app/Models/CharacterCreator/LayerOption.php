@@ -92,7 +92,7 @@ class LayerOption extends Model
      */
     public function getLineImageUrlAttribute(){
         $line = $this->layers()->where('type', 'lines')->first();
-        return $line->imageUrl ?? null;
+        return $line->imageFilePath  ?? null;
     }
 
     /**
@@ -138,21 +138,6 @@ class LayerOption extends Model
         OTHER FUNCTIONS
 
     **********************************************************************************************/
-
-    /**
-     * Merges layers of this option into one image.
-     *
-     * @return Image
-     */
-    public function merge(){
-
-        $layers = $this->layers()->orderBy('sort', 'ASC')->get();
-        $merged = Image::make($layers->first()->imageUrl);
-        foreach($layers as $layer){
-            $merged->insert($layer->imageUrl);
-        }
-        return $merged;
-    }
 
     /**
      * Gets a select ready array of all marking options.
