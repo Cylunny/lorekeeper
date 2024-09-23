@@ -91,6 +91,7 @@ class CharacterCreatorManager extends Service
             foreach ($choicesByGroup as $sort => $choices) {
                 $merge = [];
                 $option = LayerOption::find($choices['option']);
+
                 if($option != null){
 
                     // sort color layers and only include those matching the option
@@ -114,7 +115,6 @@ class CharacterCreatorManager extends Service
                         $markingLayer = Layer::find($choices['marking']);
                         $markingUrl = $this->colorize($markingLayer->imageFilePath, $choices['markingcolor']);
                         $merge[] = $markingUrl;
-
                     }
                     // get line image url
                     $merge[] = $option->lineImageUrl;
@@ -173,11 +173,9 @@ class CharacterCreatorManager extends Service
                     $merged = Image::make($image);
                     $base = true;
                 } else {
-                    Log::info($merged);
                     $merged = $merged->insert($image);
                 }
             }
-            Log::info($merged);
 
             $merged->encode('data-url');
             $this->commitReturn(true);
