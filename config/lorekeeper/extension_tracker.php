@@ -12,5 +12,13 @@ return [
     //     'version' => '1.0.0',
     // ],
     
+    'character_creator' => [
+        'key' => 'character_creator',
+        'wiki_key' => 'Character Creator',
+        'creators' => json_encode([
+            'Cylunny' => 'https://toyhou.se/cylunny',
+        ]),
+        'version' => '1.0.0', 
+    ],
 
 ];
