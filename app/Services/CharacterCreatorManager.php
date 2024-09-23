@@ -45,93 +45,99 @@ class CharacterCreatorManager extends Service
      */
     public function getImages($creator, $request)
     {
-
-        $reload = $request['reload'];
-        $changed = [];
-        $previous = Session::get('previous_creator');
-
-        if($previous) {
-            // get the groups that actually changed
-            foreach ($request->except('_token', 'reload') as $key => $value) {
-                if(isset($previous[$key]) && $previous[$key] != $value){
-                    // a change!
-                    $changed[] = $split = explode("_", $key)[0];
-                }
-            }
-        }
-
-        $choicesByGroup = [];
-        // build nestled array for easy request data access
-        foreach ($request->except('_token', 'reload') as $key => $value) {
-            $split = explode("_", $key);
-            $groupId = $split[0];
-
-            //only add groups that changed for updated images
-            if($reload == true || count($changed) <= 0 || in_array($groupId, $changed)){
-                $selectionType = $split[1];
-                $group = LayerGroup::find($groupId);
-
-                if(isset($group)){
-                    $sort = $group->sort;
-                    $choicesByGroup[$sort]['groupId'] = $groupId;
-                    if ($selectionType == 'option') $choicesByGroup[$sort]['option'] = $value;
-                    if ($selectionType == 'marking') $choicesByGroup[$sort]['marking'] = $value;
-                    if ($selectionType == 'markingcolor') $choicesByGroup[$sort]['markingcolor'] = $value;
-                    if (is_numeric($selectionType)) $choicesByGroup[$sort]['colorlayers'][$selectionType] = $value;
-                }
-            }
-        };
-
-        //sort by key to keep layer order
-        ksort($choicesByGroup);
+        try {
         
-        $images = [];
-        //go over the layer choices and build the base64 images
-        foreach ($choicesByGroup as $sort => $choices) {
-            $merge = [];
-            $option = LayerOption::find($choices['option']);
-            if($option != null){
+            $reload = $request['reload'];
+            $changed = [];
+            $previous = Session::get('previous_creator');
 
-                // sort color layers and only include those matching the option
-                if(isset($choices['colorlayers'])){
-                    $colorLayers = array_intersect_key($choices['colorlayers'], array_flip($option->layers()->pluck('id')->toArray()));
-                } else {
-                    $colorLayers = [];
-                }
-
-                // color the color layers
-                foreach ($option->layers as $layer) {
-                    if($layer->type == 'color'){
-                        $color = $colorLayers[$layer->id] ?? '#FFFFFF';
-                        $colorUrl = $this->colorize($layer->imageFilePath, $color);
-                        $merge[] = $colorUrl;
+            if($previous) {
+                // get the groups that actually changed
+                foreach ($request->except('_token', 'reload') as $key => $value) {
+                    if(isset($previous[$key]) && $previous[$key] != $value){
+                        // a change!
+                        $changed[] = $split = explode("_", $key)[0];
                     }
                 }
-                
-                // get marking layer and color it then turn it into a b64 image url
-                if(isset($choices['marking']) && $option->layers()->pluck('id')->contains($choices['marking'])){
-                    $markingLayer = Layer::find($choices['marking']);
-                    $markingUrl = $this->colorize($markingLayer->imageFilePath, $choices['markingcolor']);
-                    $merge[] = $markingUrl;
-
-                }
-                // get line image url
-                $merge[] = $option->lineImageUrl;
-                //merge option image
-                $merged = Image::make($merge[0]);
-                foreach($merge as $i => $image){
-                    $merged = $merged->insert($image);
-                }
-                $merged->encode('data-url');
-                $images[$choices['groupId']] = $merged;
-            } else {
-                //remove an image by hiding it
-                $images[$choices['groupId']] = null;
             }
-                
+
+            $choicesByGroup = [];
+            // build nestled array for easy request data access
+            foreach ($request->except('_token', 'reload') as $key => $value) {
+                $split = explode("_", $key);
+                $groupId = $split[0];
+
+                //only add groups that changed for updated images
+                if($reload == true || count($changed) <= 0 || in_array($groupId, $changed)){
+                    $selectionType = $split[1];
+                    $group = LayerGroup::find($groupId);
+
+                    if(isset($group)){
+                        $sort = $group->sort;
+                        $choicesByGroup[$sort]['groupId'] = $groupId;
+                        if ($selectionType == 'option') $choicesByGroup[$sort]['option'] = $value;
+                        if ($selectionType == 'marking') $choicesByGroup[$sort]['marking'] = $value;
+                        if ($selectionType == 'markingcolor') $choicesByGroup[$sort]['markingcolor'] = $value;
+                        if (is_numeric($selectionType)) $choicesByGroup[$sort]['colorlayers'][$selectionType] = $value;
+                    }
+                }
+            };
+
+            //sort by key to keep layer order
+            ksort($choicesByGroup);
+            
+            $images = [];
+            //go over the layer choices and build the base64 images
+            foreach ($choicesByGroup as $sort => $choices) {
+                $merge = [];
+                $option = LayerOption::find($choices['option']);
+                if($option != null){
+
+                    // sort color layers and only include those matching the option
+                    if(isset($choices['colorlayers'])){
+                        $colorLayers = array_intersect_key($choices['colorlayers'], array_flip($option->layers()->pluck('id')->toArray()));
+                    } else {
+                        $colorLayers = [];
+                    }
+
+                    // color the color layers
+                    foreach ($option->layers as $layer) {
+                        if($layer->type == 'color'){
+                            $color = $colorLayers[$layer->id] ?? '#FFFFFF';
+                            $colorUrl = $this->colorize($layer->imageFilePath, $color);
+                            $merge[] = $colorUrl;
+                        }
+                    }
+                    
+                    // get marking layer and color it then turn it into a b64 image url
+                    if(isset($choices['marking']) && $option->layers()->pluck('id')->contains($choices['marking'])){
+                        $markingLayer = Layer::find($choices['marking']);
+                        $markingUrl = $this->colorize($markingLayer->imageFilePath, $choices['markingcolor']);
+                        $merge[] = $markingUrl;
+
+                    }
+                    // get line image url
+                    $merge[] = $option->lineImageUrl;
+                    //merge option image
+                    $merged = Image::make($merge[0]);
+                    foreach($merge as $i => $image){
+                        $merged = $merged->insert($image);
+                    }
+                    $merged->encode('data-url');
+                    $images[$choices['groupId']] = $merged;
+                } else {
+                    //remove an image by hiding it
+                    $images[$choices['groupId']] = null;
+                }
+                    
+            }
+            Session::put('previous_creator', $request->all());
+            return $images;
+        } catch(\Exception $e) {
+            Log::info($e);
+            $this->setError('error', $e->getMessage());
+            return $e;
         }
-        Session::put('previous_creator', $request->all());
-        return $images;
     }
 
 

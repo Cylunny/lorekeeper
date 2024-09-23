@@ -94,7 +94,7 @@
             $('.cp').colorpicker();
             $('#spinner').addClass('hide');
         }).fail(function(jqXHR, textStatus, errorThrown) {
-            alert("AJAX call failed: " + textStatus + ", " + errorThrown);
+            alert("AJAX call failed: " + textStatus + ", " + errorThrown + ". If you are an admin, please check the application logs.");
         });
 
         if(evt) {
