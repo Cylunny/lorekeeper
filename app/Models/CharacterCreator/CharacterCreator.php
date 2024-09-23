@@ -180,6 +180,17 @@ class CharacterCreator extends Model
         return $this->id . '-creator-.' . $this->image_extension;
     }
 
+    
+    /**
+     * Gets the height of the images, should be the same for all of them so...
+     *
+     * @return array
+     */
+    public function getImageHeightAttribute(){
+
+        return $this->layerGroups()->first()->imageHeight ?? 0;
+    }
+
 
     /**********************************************************************************************
 

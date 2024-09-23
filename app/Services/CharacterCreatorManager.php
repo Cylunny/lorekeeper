@@ -55,7 +55,6 @@ class CharacterCreatorManager extends Service
             foreach ($request->except('_token', 'reload') as $key => $value) {
                 if(isset($previous[$key]) && $previous[$key] != $value){
                     // a change!
-                    Log::info("A CHANGE");
                     $changed[] = $split = explode("_", $key)[0];
                 }
             }
@@ -159,16 +158,26 @@ class CharacterCreatorManager extends Service
                 }
             }
             // create the image from the request
-            $imageArray = $this->getImages($creator, $request);
+            $imageArray = array_filter($this->getImages($creator, $request));
 
-            $merged = Image::make($imageArray[0]);
+            $merged = null;
+            $base = false;
             foreach($imageArray as $i => $image){
-                $merged = $merged->insert($image);
+                if(!$base){
+                    $merged = Image::make($image);
+                    $base = true;
+                } else {
+                    Log::info($merged);
+                    $merged = $merged->insert($image);
+                }
             }
+            Log::info($merged);
+
             $merged->encode('data-url');
             $this->commitReturn(true);
             return $merged;
         } catch(\Exception $e) {
+            Log::info($e);
             $this->setError('error', $e->getMessage());
         }
         return $this->rollbackReturn(false);

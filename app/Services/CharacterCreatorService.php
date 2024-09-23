@@ -411,7 +411,7 @@ class CharacterCreatorService extends Service
                 $this->handleImage($image, $layer->imagePath, $layer->imageFileName, $old);
             }
 
-            if(!isset($data['delete']) && $data['type'] == 'lines' && $layer->layerOption->countLineLayers() >= 1){
+            if($data['type'] == 'lines' && $layer->layerOption->countLineLayers() == 1 && $layer->id != $layer->layerOption->lineLayer->id){
                 throw new \Exception("There can only be one line layer per layer option.");
             } 
 

@@ -9,16 +9,26 @@
 
     <p>Are you sure you want to do this? <b>This might take a while to load due to image manipulations.</b></p>
 
-    <a href="#" class="btn btn-success float-right confirm-create-character-button">Create Character</a>
+    <a href="#" class="btn btn-success float-right confirm-create-character-button">
+    Create Character
+    </a>
+
 @endif
 
 <script>
-    
+
     $('.confirm-create-character-button').on('click', function(e) {
         e.preventDefault();
 
+        if ($(this).hasClass('disabled')) {
+            return false;
+        }
+        $(this).addClass('disabled');
+        $(this).html('<i class="fas fa-spinner fa-spin"></i>');
+
         var data = {
             "_token": "{{ csrf_token() }}",
+            "reload": 1
         };
         $(".form-control").each(function(index, element) {
             var name = $(this).attr("name");

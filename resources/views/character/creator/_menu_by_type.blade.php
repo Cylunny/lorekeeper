@@ -1,5 +1,5 @@
 
-<div class="col-lg-5 col-12">
+<div class="col-xl-5 col-12">
         <div class="card w-100 h-100">
             <div class="card-header">
                 <ul class="nav nav-tabs card-header-tabs">

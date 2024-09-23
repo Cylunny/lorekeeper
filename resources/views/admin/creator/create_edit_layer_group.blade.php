@@ -47,7 +47,7 @@
 <h3>Layer Options</h3>
 <p>
     Put different options for the layer group here! For example, if the group is hair, you could put different hairstyle options here. The actual file layers will then be within the layer option. Layer Options can be created once the group was saved.
-    Layer options that are on top of the list will also display first. Those at the bottom will display last. <b>Make sure to save layer option order at least once!</b>
+    Layer options that are on top of the list will also display first. Those at the bottom will display last.
 </p>
 @if(!count($group->layerOptions))
 <p class="alert alert-secondary">No options found.</p>

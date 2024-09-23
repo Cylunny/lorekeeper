@@ -4,28 +4,8 @@ namespace App\Models\CharacterCreator;
 
 use Config;
 use DB;
-use Carbon\Carbon;
-use Notifications;
 use App\Models\Model;
-
-use App\Models\User\User;
-use App\Models\User\UserCharacterLog;
-
-use App\Models\Character\CharacterCategory;
-use App\Models\Character\CharacterTransfer;
-use App\Models\Character\CharacterBookmark;
-
-use App\Models\Character\CharacterCurrency;
-use App\Models\Currency\Currency;
-use App\Models\Currency\CurrencyLog;
-
-use App\Models\Character\CharacterItem;
-use App\Models\Item\Item;
-use App\Models\Item\ItemLog;
-
-use App\Models\Submission\Submission;
-use App\Models\Submission\SubmissionCharacter;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class Layer extends Model
 {
@@ -149,6 +129,15 @@ class Layer extends Model
     public function getImageFileNameAttribute()
     {
         return $this->id . '-layer-' . $this->image_extension;
+    }
+
+    /**
+     * Gets the height of the images, should be the same for all of them so...
+     *
+     * @return array
+     */
+    public function getImageHeightAttribute(){
+        return Image::make($this->imageUrl)->height() ?? 0;
     }
 
     /**********************************************************************************************

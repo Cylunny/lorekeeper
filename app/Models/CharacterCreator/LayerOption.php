@@ -123,6 +123,16 @@ class LayerOption extends Model
         return $this->layers()->where('type', 'lines')->first() ?? null;
     }
 
+    /**
+     * Gets the height of the images, should be the same for all of them so...
+     *
+     * @return array
+     */
+    public function getImageHeightAttribute(){
+
+        return $this->layers()->first()->imageHeight ?? 0;
+    }
+
     /**********************************************************************************************
 
         OTHER FUNCTIONS

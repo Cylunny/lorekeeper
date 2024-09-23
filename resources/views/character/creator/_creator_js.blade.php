@@ -57,7 +57,10 @@
         updatePreview(evt);
     });
 
+
     function updatePreview(evt) {
+        $('#spinner').removeClass('hide');
+
         // update the image stack
         var data = {
             "_token": "{{ csrf_token() }}",
@@ -79,14 +82,17 @@
             dataType: "html",
             data: data,
         }).done(function(res) {
-            //$("#creator-container").html(res);  
             $(res).each(function(i, obj) {
                 //replace images with new ones OR add new ones
                 if(obj.id){
-                     $("#" + obj.id).html(obj); 
-                }
+                     $("#" + obj.id).html(obj);
+                     if(obj.src != '') {
+                        $("#" + obj.id).removeClass('hide'); 
+                     }
+                } 
             });       
             $('.cp').colorpicker();
+            $('#spinner').addClass('hide');
         }).fail(function(jqXHR, textStatus, errorThrown) {
             alert("AJAX call failed: " + textStatus + ", " + errorThrown);
         });
@@ -108,5 +114,6 @@
                 });
             }
         }
+
     }
 </script>

@@ -99,7 +99,7 @@
 <h3>Layer Groups</h3>
 <p>
     Layer groups are meant to group multiple different options for one intended layer. Such a layer could be: hair, eyes, body, wings etc. Layer groups can be created after the creator was saved.
-    Make sure to sort them with the layers that should be on top being on top of the list, and those at the bottom at the bottom. <b>Also make sure to save layer group order at least once!</b>
+    Make sure to sort them with the layers that should be on top being on top of the list, and those at the bottom at the bottom.
 </p>
 @if(!count($creator->layerGroups))
 <p class="alert alert-secondary">No groups found.</p>
