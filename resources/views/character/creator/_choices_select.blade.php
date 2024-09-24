@@ -1,7 +1,7 @@
 
 @if($option)
     <div class="form-group row">
-    @foreach($option->layers()->where('type', 'color')->get() as $colorlayer)
+    @foreach($option->layers()->where('type', 'color')->orderBy('sort', 'DESC')->get() as $colorlayer)
         <div class="input-group cp col-xl-6 col-12">
             {!! Form::text($group->id . '_' . $colorlayer->id .'_color', '#ffffff', ['class' => 'form-control creator-colorpicker']) !!}
             <span class="input-group-append">

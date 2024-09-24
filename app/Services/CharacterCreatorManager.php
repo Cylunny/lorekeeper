@@ -102,7 +102,7 @@ class CharacterCreatorManager extends Service
                     }
 
                     // color the color layers
-                    foreach ($option->layers as $layer) {
+                    foreach ($option->layers()->orderBy('sort')->get() as $layer) {
                         if($layer->type == 'color'){
                             $color = $colorLayers[$layer->id] ?? '#FFFFFF';
                             $colorUrl = $this->colorize($layer->imageFilePath, $color);

@@ -45,10 +45,9 @@
     You can, however, add multiple color or detail layers as well.</b>
 </p>
 <ul>
-    <li><b>Line Layers</b> should be your transparent linework, or your colored AND lined artwork if you do not wish to let users color anything in.</li>
+    <li><b>Line Layers</b> should be your transparent linework, or your colored AND lined artwork if you do not wish to let users color anything in. They will ALWAYS be on top, regardless of sort order below.</li>
     <li><b>Color Layers</b> should be the base color matching the lines above, and must be fully white (RGB 255,255,255). You can make multiple color layers, such as a seperate one for sclera and iris of an eye.These will each have their own color that can be set and are not a choice.</li>
     <li><b>Detail Layers</b> are intended for use cases such as adding markings on top of a base layer, and must be fully white (RGB 255,255,255). Users can only pick one out of all detail layers. The picked layer can be colored by the user.</li>
-
 </ul>
 
 
