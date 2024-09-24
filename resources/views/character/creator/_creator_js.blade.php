@@ -109,6 +109,7 @@
                     dataType: "text"
                 }).done(function(res) {
                     $("#" + groupId + "_choices").html(res);
+                    $('.cp').colorpicker();
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     alert("AJAX call failed: " + textStatus + ", " + errorThrown);
                 });
