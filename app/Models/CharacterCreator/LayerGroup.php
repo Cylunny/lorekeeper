@@ -73,7 +73,7 @@ class LayerGroup extends Model
      */
     public function layerOptions()
     {
-        return $this->hasMany('App\Models\CharacterCreator\LayerOption', 'layer_group_id');
+        return $this->hasMany('App\Models\CharacterCreator\LayerOption', 'layer_group_id')->orderBy('sort', 'DESC');
     }
 
 

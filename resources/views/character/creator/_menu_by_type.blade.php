@@ -29,9 +29,8 @@
                     @foreach($creator->layerGroups()->orderBy('sort', 'DESC')->get() as $group)
                         @php $option = $group->layerOptions()->first(); @endphp
                         @if($option->layers()->where('type', 'color')->count() > 0)
-                            <h5>{{ $group->name }}</h5>
-
                             <div id="{{ $group->id . '_choices' }}">
+                                <h5 class="m-0">{{ $group->name }}</h5>
                                 <div class="form-group row">
                                 @foreach($option->layers()->where('type', 'color')->get() as $colorlayer)
                                         <div class="input-group cp col-xl-6 col-12">
@@ -60,6 +59,11 @@
                                     </div>
                                 @endif
                             </div>
+                        @else
+                        <div id="{{ $group->id . '_choices' }}">
+                            <h5 class="m-0">{{ $group->name }}</h5>
+                            <div class="p-2">No color layer set.</div>
+                        </div>
                         @endif
                     @endforeach
                 </div>
