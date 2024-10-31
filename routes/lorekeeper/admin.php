@@ -116,6 +116,7 @@ Route::group(['prefix' => 'data', 'namespace' => 'Data', 'middleware' => 'power:
     Route::post('species/edit/{id?}', 'SpeciesController@postCreateEditSpecies');
     Route::post('species/delete/{id}', 'SpeciesController@postDeleteSpecies');
     Route::post('species/sort', 'SpeciesController@postSortSpecies');
+
     Route::get('subtypes', 'SpeciesController@getSubtypeIndex');
     Route::get('subtypes/create', 'SpeciesController@getCreateSubtype');
     Route::get('subtypes/edit/{id}', 'SpeciesController@getEditSubtype');
@@ -124,6 +125,11 @@ Route::group(['prefix' => 'data', 'namespace' => 'Data', 'middleware' => 'power:
     Route::post('subtypes/edit/{id?}', 'SpeciesController@postCreateEditSubtype');
     Route::post('subtypes/delete/{id}', 'SpeciesController@postDeleteSubtype');
     Route::post('subtypes/sort', 'SpeciesController@postSortSubtypes');
+
+    # SPECIES CHECKLIST
+    Route::get('species-approval-checklists', 'SpeciesController@getApprovalChecklistIndex');
+    Route::get('species-approval-checklists/edit/{id}', 'SpeciesController@getEditSpeciesApprovalChecklist');
+    Route::post('species-approval-checklists/edit/{id?}', 'SpeciesController@postEditSpeciesApprovalChecklist');
 
     # ITEMS
     Route::get('item-categories', 'ItemController@getIndex');

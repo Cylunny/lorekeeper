@@ -72,6 +72,14 @@ class Subtype extends Model
         return $this->belongsTo('App\Models\Species\Species', 'species_id');
     }
 
+    /**
+     * Get the species the subtype belongs to.
+     */
+    public function checklist() 
+    {
+        return $this->hasOne('App\Models\Species\SubtypeApprovalChecklist');
+    }
+
     /**********************************************************************************************
     
         ACCESSORS

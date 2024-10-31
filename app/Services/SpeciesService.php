@@ -8,6 +8,8 @@ use Config;
 use App\Models\Species\Species;
 use App\Models\Species\Subtype;
 use App\Models\Character\CharacterImage;
+use App\Models\Species\SpeciesApprovalChecklist;
+use App\Models\Species\SubtypeApprovalChecklist;
 
 class SpeciesService extends Service
 {
@@ -295,6 +297,55 @@ class SpeciesService extends Service
             }
 
             return $this->commitReturn(true);
+        } catch(\Exception $e) { 
+            $this->setError('error', $e->getMessage());
+        }
+        return $this->rollbackReturn(false);
+    }
+
+    /**
+     * Updates an approval checklist.
+     *
+     * @param  \App\Models\Species\Species  $species
+     * @param  array                        $data 
+     * @param  \App\Models\User\User        $user
+     * @return bool|\App\Models\Species\Species
+     */
+    public function updateApprovalChecklist($species, $data, $user)
+    {
+        DB::beginTransaction();
+
+        try {
+            // save checklist updates
+            $checklist = SpeciesApprovalChecklist::where('species_id', $species->id)->first();
+            if($checklist){
+                $checklist->parsed_description = parse($data['description']);
+                $checklist->description = $data['description'];
+                $checklist->save();
+            } else {
+                if(isset($data['description']) && $data['description']) $data['parsed_description'] = parse($data['description']);
+                $checklist = SpeciesApprovalChecklist::create($data);
+            }
+
+            //save subtype updates
+            foreach($data['subtype_ids'] as $index => $subtypeId) {
+                $descr = $data['subtype_descriptions'][$index];
+                $subtypeChecklist = SubtypeApprovalChecklist::where('subtype_id', $subtypeId)->first();
+                if($subtypeChecklist){
+                    $subtypeChecklist->parsed_description = parse($descr);
+                    $subtypeChecklist->description = $descr;
+                    $subtypeChecklist->subtype_id = $subtypeId;
+                } else {
+                    $subtypeChecklist = SubtypeApprovalChecklist::create([
+                        'subtype_id' => $subtypeId,
+                        'parsed_description' => parse($descr),
+                        'description' => $descr
+                    ]);
+                }
+                $subtypeChecklist->save();
+            }
+
+            return $this->commitReturn($species);
         } catch(\Exception $e) { 
             $this->setError('error', $e->getMessage());
         }

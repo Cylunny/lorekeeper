@@ -77,6 +77,14 @@ class Species extends Model
         return $this->hasMany('App\Models\Feature\Feature');
     }
 
+    /**
+     * Get the species the subtype belongs to.
+     */
+    public function checklist() 
+    {
+        return $this->hasOne('App\Models\Species\SpeciesApprovalChecklist');
+    }
+
     /**********************************************************************************************
     
         ACCESSORS

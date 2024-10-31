@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin\Data;
 use Illuminate\Http\Request;
 
 use Auth;
-
 use App\Models\Species\Species;
 use App\Models\Species\Subtype;
 use App\Models\Character\Sublist;
+use App\Models\Species\SpeciesApprovalChecklist;
+use App\Models\Species\SubtypeApprovalChecklist;
 
 use App\Services\SpeciesService;
 
@@ -256,6 +257,64 @@ class SpeciesController extends Controller
     {
         if($service->sortSubtypes($request->get('sort'))) {
             flash('Subtype order updated successfully.')->success();
+        }
+        else {
+            foreach($service->errors()->getMessages()['error'] as $error) flash($error)->error();
+        }
+        return redirect()->back();
+    }
+
+    /**
+     * APPROVAL CHECKLISTS
+     *
+     **/
+
+
+    /**
+     * Shows the checklist index.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getApprovalChecklistIndex()
+    {
+        return view('admin.specieses.checklists', [
+            'specieses' => Species::orderBy('sort', 'DESC')->get()
+        ]);
+    }
+
+    /**
+     * Shows the edit checklist page.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getEditSpeciesApprovalChecklist($id)
+    {
+        $species = Species::find($id);
+        if(!$species) abort(404);
+        return view('admin.specieses.create_edit_species_approval_checklist', [
+            'species' => $species,
+            'subtypes' => $species->subtypes,
+            'checklist' => $species->checklist,
+        ]);
+    }
+
+    /**
+     * Creates or edits a checklist.
+     *
+     * @param  \Illuminate\Http\Request     $request
+     * @param  App\Services\SpeciesService  $service
+     * @param  int|null                     $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function postEditSpeciesApprovalChecklist(Request $request, SpeciesService $service, $id = null)
+    {
+        $request->validate(SpeciesApprovalChecklist::$updateRules);
+        $data = $request->only([
+            'species_id', 'description', 'subtype_ids', 'subtype_descriptions'
+        ]);
+        if($id && $service->updateApprovalChecklist(Species::find($id), $data, Auth::user())) {
+            flash('Approval Checklist updated successfully.')->success();
         }
         else {
             foreach($service->errors()->getMessages()['error'] as $error) flash($error)->error();

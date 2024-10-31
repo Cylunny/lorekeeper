@@ -11,19 +11,20 @@
 
 @if($request->has_image)
     <div class="card mb-3">
-        <div class="card-body bg-secondary text-white">
+        <div class="card-body p-2">
             <div class="row mb-3">
-                <div class="col-md-6">
+                <div class="col-md-8 bg-secondary text-white">
                     <h3 class="text-center">Main Image</h3>
                     <div class="text-center">
                         <a href="{{ $request->imageUrl }}"><img src="{{ $request->imageUrl }}" class="mw-100" alt="Request {{ $request->id }}" /></a>
                     </div>
-                </div>
-                <div class="col-md-6">
                     <h3 class="text-center">Thumbnail Image</h3>
                     <div class="text-center">
                         <a href="{{ $request->thumbnailUrl }}"><img src="{{ $request->thumbnailUrl }}" class="mw-100" alt="Thumbnail for request {{ $request->id }}" /></a>
                     </div>
+                </div>
+                <div class="col-md-4 p-4">
+                    @include('character.design._checklist', ['request' => $request])
                 </div>
             </div>
         </div>

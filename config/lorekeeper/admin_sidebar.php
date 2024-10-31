@@ -149,6 +149,10 @@ return [
                 'url' => 'admin/data/species'
             ],
             [
+                'name' => 'Species Approval Checklists',
+                'url' => 'admin/data/species-approval-checklists'
+            ],
+            [
                 'name' => 'Subtypes',
                 'url' => 'admin/data/subtypes'
             ],
