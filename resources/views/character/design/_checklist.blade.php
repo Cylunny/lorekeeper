@@ -40,11 +40,11 @@ $subChecklist = $request->subtype->checklist ?? null;
 @if(isset($request->species))
     <hr>
     <h5>Species Approval Checklist</h5>
-    {!! $checklist->parsed_description !!}
+    {!! $checklist->parsed_description ?? 'None provided.' !!}
 @endif
 
 @if(isset($request->subtype))
     <hr>
     <h5>Subtype Approval Checklist</h5>
-    {!! $subChecklist->parsed_description !!}
+    {!! $subChecklist->parsed_description ?? 'None provided.' !!}
 @endif
