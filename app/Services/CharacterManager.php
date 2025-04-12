@@ -1425,6 +1425,9 @@ class CharacterManager extends Service {
             if ($recipient->is_banned) {
                 throw new \Exception('Cannot transfer character to a banned member.');
             }
+            if (!$recipient->canBeMessagedBy($user)) {
+                throw new \Exception('Character could not be transferred.');
+            }
 
             // deletes any pending design drafts
             foreach ($character->designUpdate as $update) {

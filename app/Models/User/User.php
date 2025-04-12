@@ -18,6 +18,7 @@ use App\Models\Rank\Rank;
 use App\Models\Rank\RankPower;
 use App\Models\Shop\ShopLog;
 use App\Models\Submission\Submission;
+use App\Models\User\ContactAuthorization;
 use App\Traits\Commenter;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -203,6 +204,10 @@ class User extends Authenticatable implements MustVerifyEmail {
      */
     public function commentLikes() {
         return $this->hasMany(CommentLike::class);
+    }
+
+    public function ContactAuthorizations(){
+        return $this->hasMany(ContactAuthorization::class, 'granted_by_user_id');
     }
 
     /**********************************************************************************************
@@ -682,5 +687,24 @@ class User extends Authenticatable implements MustVerifyEmail {
      */
     public function hasBookmarked($character) {
         return CharacterBookmark::where('user_id', $this->id)->where('character_id', $character->id)->first();
+    }
+
+     /**
+     * Checks if a given user is authorized to message the current user.
+     *
+     * @param mixed $user
+     *
+     */
+    public function canBeMessagedBy($user){
+        if($this->settings->allow_contact == 1){
+            // allows all messages, all good
+            return true;
+        } else {
+            // only let mods and authorized users through
+            if($user->isStaff || $this->ContactAuthorizations->pluck('granted_to_user_id')->contains($user->id)){
+                return true;
+            }
+        }
+        return false;
     }
 }

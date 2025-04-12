@@ -62,7 +62,11 @@ class AccountController extends Controller {
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function getSettings() {
-        return view('account.settings');
+        
+        return view('account.settings', [
+            'users' => User::where('is_banned', 0)->where('is_deactivated', 0)->orderBy('id')->pluck('name', 'id'),
+            'authorized' => Auth::user()->ContactAuthorizations->pluck('granted_to_user_id'),
+        ]);
     }
 
     /**
@@ -111,6 +115,22 @@ class AccountController extends Controller {
             }
         }
 
+        return redirect()->back();
+    }
+
+    /**
+     * Edits the user's message settings.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function postContactSettings(Request $request, UserService $service) {
+        if ($service->updateContactSettings($request->only('authorized', 'allow_contact'), Auth::user())) {
+            flash('Contact Settings updated successfully.')->success();
+        } else {
+            foreach ($service->errors()->getMessages()['error'] as $error) {
+                flash($error)->error();
+            }
+        }
         return redirect()->back();
     }
 

@@ -13,6 +13,7 @@ use App\Models\Submission\Submission;
 use App\Models\Trade;
 use App\Models\User\User;
 use App\Models\User\UserUpdateLog;
+use App\Models\User\ContactAuthorization;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -376,6 +377,50 @@ class UserService extends Service {
 
             $user->name = $username;
             $user->save();
+
+            return $this->commitReturn(true);
+        } catch (\Exception $e) {
+            $this->setError('error', $e->getMessage());
+        }
+
+        return $this->rollbackReturn(false);
+    }
+
+    /**
+     * Updates user's contact settings.
+     *
+     * @param mixed $data
+     * @param mixed $user
+     */
+    public function updateContactSettings($data, $user) {
+        DB::beginTransaction();
+
+        try {
+            $user->settings->allow_contact = isset($data['allow_contact']) ? 1 : 0;
+            $user->settings->save();
+
+            if(isset($data['authorized'])){
+                $authorized = $data['authorized'];
+
+                //delete all auths that are no longer valid
+                foreach($user->ContactAuthorizations as $auth){
+                    if(!in_array($auth->granted_to_user_id, $authorized)){
+                        $auth->delete();
+                    }
+                }
+                //save new auths
+                foreach($authorized as $userId){
+                    if(!$user->ContactAuthorizations->pluck('granted_to_user_id')->contains($userId)){
+                        ContactAuthorization::create([
+                            'granted_by_user_id' => $user->id,
+                            'granted_to_user_id' => $userId
+                        ]);
+                    }
+                }
+            } else {
+                //delete all auths
+                $user->ContactAuthorizations()->delete();
+            }
 
             return $this->commitReturn(true);
         } catch (\Exception $e) {

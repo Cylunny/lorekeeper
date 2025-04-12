@@ -175,6 +175,9 @@ class CurrencyManager extends Service {
             if ($recipient->logType == 'User' && $recipient->is_banned) {
                 throw new \Exception('Cannot transfer currency to a banned member.');
             }
+            if (!$recipient->canBeMessagedBy($sender)) {
+                throw new \Exception('Currency could not be transferred.');
+            }
             if (!$currency) {
                 throw new \Exception('Invalid currency selected.');
             }

@@ -93,7 +93,6 @@ class CommentController extends Controller {
         $comment->approved = !config('comments.approval_required');
 
         $comment->type = isset($request['type']) && $request['type'] ? $request['type'] : 'User-User';
-        $comment->save();
 
         $recipient = null;
         $post = null;
@@ -152,6 +151,16 @@ class CommentController extends Controller {
                 break;
         }
 
+        //check if recipient can be contacted if recipient != sender
+        if($recipient != $sender && !$recipient->canBeMessagedBy($sender)){
+            flash('Comment could not be created.')->error();
+            return Redirect::to(URL::previous().'#comment-'.$comment->getKey());
+        }
+
+        //save the comment
+        $comment->save();
+
+        //notify recipient of the comment
         if ($recipient != $sender) {
             Notifications::create('COMMENT_MADE', $recipient, [
                 'comment_url' => $link,
@@ -225,12 +234,19 @@ class CommentController extends Controller {
         $reply->comment = config('lorekeeper.settings.wysiwyg_comments') ? parse($request->message) : $request->message;
         $reply->type = $comment->type;
         $reply->approved = !config('comments.approval_required');
-        $reply->save();
 
         // url = url('comments/32')
 
         $sender = User::find($reply->commenter_id);
         $recipient = User::find($comment->commenter_id);
+
+        //check if recipient can be contacted if recipient != sender
+        if($recipient != $sender && !$recipient->canBeMessagedBy($sender)){
+            flash('Comment could not be created.')->error();
+            return Redirect::to(URL::previous().'#comment-'.$comment->getKey());
+        }
+                
+        $reply->save();
 
         // if($sender == $recipient)
         if ($recipient != $sender) {
@@ -272,6 +288,12 @@ class CommentController extends Controller {
             return Redirect::back();
         }
         $comment = Comment::findOrFail($id);
+        
+        //check if recipient can be contacted if recipient != sender
+        if(!$comment->commenter->canBeMessagedBy($user)){
+            flash('Comment could not be liked.')->error();
+            return Redirect::to(URL::previous().'#comment-'.$comment->getKey());
+        }
 
         if ($comment->likes()->where('user_id', $user->id)->exists()) {
             if ($action == $comment->likes()->where('user_id', $user->id)->first()->is_like) {

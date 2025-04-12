@@ -45,6 +45,11 @@ class TradeManager extends Service {
                 throw new \Exception('The recipient is a banned user and cannot receive a trade.');
             }
 
+            //check if recipient can be contacted if recipient != sender
+            if(!$recipient->canBeMessagedBy($user)){
+                throw new \Exception('This user cannot receive a trade.');
+            }
+            
             $trade = Trade::create([
                 'sender_id'              => $user->id,
                 'recipient_id'           => $data['recipient_id'],

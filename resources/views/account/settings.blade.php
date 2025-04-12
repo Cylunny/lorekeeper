@@ -109,6 +109,36 @@
     </div>
 
     <div class="card p-3 mb-2">
+        <h3>Contact Settings</h3>
+        <p>Decide how you would like to be contacted with messages, comments, trades and transfers on Realms Away. </p>
+        <p>
+            <i>
+            PLEASE NOTE: If allow all contact is turned off, unauthorized users will also be unable to reply to you. This can cause issues when trying to participate in auctions.
+            </i>
+        </p>
+        
+        {!! Form::open(['url' => 'account/contact']) !!}
+        <div class="form-group row">
+            <label class="col-md-2 col-form-label">Authorized Users</label>
+            <div class="col-md-10">
+                {!! Form::label('authorized[]', 'Authorized User(s)') !!} {!! add_help('Select up to 25 users that will still be able to contact you, even if messaging is off. Staff can always contact you.') !!}
+                {!! Form::select('authorized[]', $users, $authorized, ['id' => 'usernameList', 'class' => 'form-control', 'multiple']) !!}            
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-2 col-form-label">Allow all contact</label>
+            <div class="col-md-10">
+                {!! Form::checkbox('allow_contact', 1, Auth::user()->settings->allow_contact, ['class' => 'form-check-input', 'data-toggle' => 'toggle']) !!}
+            </div>
+        </div>
+        <div class="text-right">
+            {!! Form::submit('Edit', ['class' => 'btn btn-primary']) !!}
+        </div>
+        {!! Form::close() !!}
+    </div>
+
+
+    <div class="card p-3 mb-2">
         <h3>Change Password</h3>
         {!! Form::open(['url' => 'account/password']) !!}
         <div class="form-group row">
@@ -172,3 +202,11 @@
         @endif
     </div>
 @endsection
+
+@section('scripts')
+ <script>
+     $('#usernameList').selectize({
+         maxItems: 25
+     });
+ </script>
+ @endsection

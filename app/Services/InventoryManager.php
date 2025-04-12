@@ -177,7 +177,6 @@ class InventoryManager extends Service {
                 if (!$sender) {
                     throw new \Exception('Invalid sender selected.');
                 }
-
                 if ($recipient->logType == 'Character' && $sender->logType == 'Character') {
                     throw new \Exception('Cannot transfer items between characters.');
                 }
@@ -252,6 +251,9 @@ class InventoryManager extends Service {
         try {
             foreach ($stacks as $key=> $stack) {
                 $quantity = $quantities[$key];
+                if (!$recipient->canBeMessagedBy($sender)) {
+                    throw new \Exception('Item(s) could not be transferred.');
+                }
                 if (!$sender->hasAlias) {
                     throw new \Exception('You need to have a linked social media account before you can perform this action.');
                 }
