@@ -40,11 +40,19 @@
     {!! Form::label('is_active', 'Set Active', ['class' => 'form-check-label ml-3']) !!} {!! add_help('If turned off, the adoption will not be visible to regular users.') !!}
 </div>
 
+
+<h3> Adoption Price over time</h3>
+
+@include('admin.adoptions._price_container')
+
+
 <div class="text-right">
     {!! Form::submit('Edit', ['class' => 'btn btn-primary']) !!}
 </div>
 
 {!! Form::close() !!}
+
+<hr>
 
 <h3>Current Adoption Stock</h3>
 @foreach($adoption->stock as $stocks)
@@ -77,4 +85,41 @@
 </div>
 @endforeach
 <a href="{{ url('admin/data/stock/create') }}" class="btn btn-primary">Create Adopt Stock</a>
+@endsection
+
+@section('scripts')
+    @parent
+    <script>
+        $(document).ready(function() {
+
+            attachRemoveListener($('#priceContainer .remove-price-button'));
+
+            var prices = $('#priceContainer');
+            var priceRow = $('#priceContainer').find('.card.hide');
+
+            $('#addPrice').on('click', function(e) {
+                e.preventDefault();
+                var priceId = Math.random().toString(16).slice(2)
+
+                //setup clone and add its unique id
+                var clone = priceRow.clone();
+                clone.removeClass('hide');
+                prices.append(clone);
+                attachRemoveListener(clone.find('.remove-price-button'));
+                var priceInput = clone.find('.price input');
+                priceInput.attr("name", "prices[" + priceId + "]");
+                var daysInput = clone.find('.days input');
+                daysInput.attr("name", "days[" + priceId + "]");
+                var currencyInput = clone.find('.currency select');
+                currencyInput.attr("name", "currency_id[" + priceId + "]");
+            });
+
+            function attachRemoveListener(node) {
+                node.on('click', function(e) {
+                    e.preventDefault();
+                    $(this).parent().parent().remove();
+                });
+            }
+        });
+    </script>
 @endsection

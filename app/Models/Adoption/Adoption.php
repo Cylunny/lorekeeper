@@ -60,6 +60,14 @@ class Adoption extends Model
     }
     
     /**
+     * Get the adoption prices.
+     */
+    public function prices() 
+    {
+        return $this->hasMany('App\Models\Adoption\AdoptionPrice');
+    }
+
+    /**
      * Get the adoption stock as items for display purposes.
      */
     public function displayStock()

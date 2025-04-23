@@ -118,7 +118,7 @@ class AdoptionController extends Controller
     {
         $id ? $request->validate(Adoption::$updateRules) : $request->validate(Adoption::$createRules);
         $data = $request->only([
-            'name', 'description', 'image', 'remove_image', 'is_active'
+            'name', 'description', 'image', 'remove_image', 'is_active', 'days', 'currency_id', 'prices'
         ]);
         if($id && $service->updateAdoption(Adoption::find($id), $data, Auth::user())) {
             flash('Adoption updated successfully.')->success();

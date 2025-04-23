@@ -9,6 +9,7 @@ use Settings;
 use App\Models\Adoption\Adoption;
 use App\Models\Adoption\AdoptionStock;
 use App\Models\Adoption\AdoptionCurrency;
+use App\Models\Adoption\AdoptionPrice;
 
 class AdoptionService extends Service
 {
@@ -55,6 +56,9 @@ class AdoptionService extends Service
             $adoption->update($data);
 
             if ($adoption) $this->handleImage($image, $adoption->adoptionImagePath, $adoption->adoptionImageFileName);
+
+            // add the prices by time
+            $this->createPrices($data['days'] ?? [], $data['prices'] ?? [], $data['currency_id'] ?? [], $adoption);
 
             return $this->commitReturn($adoption);
         } catch(\Exception $e) { 
@@ -241,6 +245,38 @@ class AdoptionService extends Service
                 'currency_id' => $data['currency_id'],
                 'cost'   => $data['cost'],
             ]);
+        }
+    }
+
+    /**
+     * Creates the prices set over time.
+     */
+    private function createPrices($days, $prices, $currencies, $adoption)
+    {
+        //we are lazy and this table will not have a lot of rows/ids anyway so...delete all and build new each edit
+        $adoption->prices()->delete();
+
+        $days = array_filter($days);
+        $currencies = array_filter($currencies);
+        $prices = array_filter($prices);
+
+        if(count($currencies) != count($days) || count($currencies) != count($prices) || count($days) != count($prices)){
+            throw new \Exception("Missing a column for timed price change. Make sure all three are filled.");
+        }
+
+        foreach ($days as $id => $day) {
+            if ($id != 'default') { // ignore empty default
+                // save price  
+                $currencyId = isset($currencies[$id]) ? $currencies[$id] :  throw new \Exception("Missing currency for timed price change.");
+                $price = isset($prices[$id]) ? $prices[$id] :  throw new \Exception("Missing price for timed price change.");
+
+                $questionEntry = AdoptionPrice::create([
+                    'adoption_id' => $adoption->id,
+                    'currency_id' => $currencyId,
+                    'amount' => $price,
+                    'days' => $day,
+                ]);
+            }
         }
     }
             

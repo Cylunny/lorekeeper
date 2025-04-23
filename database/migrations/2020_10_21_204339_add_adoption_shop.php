@@ -13,7 +13,7 @@ class AddAdoptionShop extends Migration
      */
     public function up()
     {
-    Schema::create('adoptions', function (Blueprint $table) {
+        Schema::create('adoptions', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
             $table->string('name');

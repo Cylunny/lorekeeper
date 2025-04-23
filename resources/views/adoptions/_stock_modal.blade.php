@@ -4,6 +4,9 @@
     <div class="text-center mb-3">
         <div class="mb-1"><a href="{{ $stock->character->url }}"><img src="{{ $stock->character->image->imageUrl }}" class="mw-100" /></a></div>
         <h5>{!! $stock->character->displayName !!}</h5>
+        @if($stock->created_at)
+        <i>This character is available since {!! pretty_date($stock->created_at) !!}</i><br>
+        @endif
         <strong>Adoption Fee:</strong>
         @if($stock->currency->count() > 1)
             <?php 
