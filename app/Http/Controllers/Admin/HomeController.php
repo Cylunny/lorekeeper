@@ -8,6 +8,7 @@ use Settings;
 use Auth;
 
 use App\Models\Submission\Submission;
+use App\Models\Adoption\Surrender;
 use App\Models\Gallery\GallerySubmission;
 use App\Models\Character\CharacterDesignUpdate;
 use App\Models\Character\CharacterTransfer;
@@ -29,6 +30,7 @@ class HomeController extends Controller
         $galleryRequireApproval = Settings::get('gallery_submissions_require_approval');
         $galleryCurrencyAwards = Settings::get('gallery_submissions_reward_currency');
         return view('admin.index', [
+            'surrenderCount' => Surrender::where('status', 'Pending')->count(),
             'submissionCount' => Submission::where('status', 'Pending')->whereNotNull('prompt_id')->count(),
             'claimCount' => Submission::where('status', 'Pending')->whereNull('prompt_id')->count(),
             'designCount' => CharacterDesignUpdate::characters()->where('status', 'Pending')->count(),

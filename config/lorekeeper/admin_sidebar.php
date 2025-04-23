@@ -81,6 +81,10 @@ return [
                 'name' => 'Claim Submissions',
                 'url' => 'admin/claims'
             ],
+            [
+                'name' => 'Surrenders',
+                'url' => 'admin/surrenders/pending'
+            ],
         ]
     ],
     'Grants' => [
@@ -159,6 +163,18 @@ return [
             [
                 'name' => 'Shops',
                 'url' => 'admin/data/shops'
+            ],
+            [
+                'name' => 'Adoption Center',
+                'url' => 'admin/data/adoptions/edit/1'
+            ],
+            [
+                'name' => 'Adopts',
+                'url' => 'admin/data/stock'
+            ],
+            [
+                'name' => 'Prompt Categories',
+                'url' => 'admin/data/prompt-categories'
             ],
             [
                 'name' => 'Currencies',
