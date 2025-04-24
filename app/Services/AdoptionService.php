@@ -5,6 +5,7 @@ use App\Services\Service;
 use DB;
 use Config;
 use Settings;
+use Carbon\Carbon;
 
 use App\Models\Adoption\Adoption;
 use App\Models\Adoption\AdoptionStock;
@@ -118,11 +119,16 @@ class AdoptionService extends Service
             if(!$data['currency_id']) throw new \Exception("The character is missing a currency type.");
             if(AdoptionStock::where('character_id', $data['character_id'])->where('id', '!=', $id)->exists()) throw new \Exception("This character is already in another stock!");
 
-            if(!isset($data['is_visible'])) $data['is_visible'] = 0;
+            $stock = AdoptionStock::find($id);
+
+            if(!isset($data['is_visible'])) {
+                $data['is_visible'] = 0;
+            } else {
+                // we want to reset the creation date so it doesn't get immediately discounted if it was hidden for a while...
+                $stock->created_at = Carbon::now();
+            }
             
             $this->populateCosts(array_only($data, ['currency_id', 'cost']), $id);
-
-            $stock = AdoptionStock::find($id);
 
             $stock->adoption_id = 1;
             $stock->character_id = $data['character_id'];

@@ -21,7 +21,7 @@
                         </div>
                         <div class="col-1">
                             Delete
-                            <a href="#" class="btn btn-danger remove-price-button">X</a>
+                            <a href="#" class="btn btn-danger remove-price-button w-100">X</a>
                         </div>
                     </div>
                 </div>
