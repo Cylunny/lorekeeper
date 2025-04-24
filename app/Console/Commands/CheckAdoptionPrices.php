@@ -58,21 +58,22 @@ class CheckAdoptionPrices extends Command
             $this->info('--------------');
             if($stock->created_at){
                 $stockDays = $stock->created_at->diffInDays(Carbon::now());
-                $this->info('Checking stock: ' . $stock->character->slug . '. Age: ' . $stockDays . ' days.');
+                $this->info('Checking stock: ' . $stock->character->slug . '. Age: ' . $stockDays . ' days. Species: ' . ($stock->character->image->species != null ? $stock->character->image->species->name : 'None'));
                 // we set all currencies even if there are multiple for a single day!
                 foreach($pricesByDays as $days => $prices){
                     if($stockDays >= $days){
-                        $this->info('Updating stock:');
                         // first delete previous prices from the stock
                         $stock->currency()->delete();
-                        // then set all new prices
                         foreach($prices as $price){
-                            $this->info( $days . ' days reached. Set to: ' . $price->amount . ' ' . $price->currency->name);
-                            AdoptionCurrency::create([
-                                'stock_id'       => $stock->id,
-                                'currency_id' => $price->currency_id,
-                                'cost'   => $price->amount,
-                            ]);
+                            // then set all new prices if species of stock matches or no price species is set
+                            if(($stock->character->image->species != null && $stock->character->image->species->id == $price->species_id) || $price->species_id == null){
+                                $this->info( $days . ' days reached. Set to: ' . $price->amount . ' ' . $price->currency->name);
+                                AdoptionCurrency::create([
+                                    'stock_id'       => $stock->id,
+                                    'currency_id' => $price->currency_id,
+                                    'cost'   => $price->amount,
+                                ]);
+                            }
                         }
                     } else {
                         $this->info('Stock is too recent for a day '. $days .' price update, moving on...');

@@ -112,6 +112,8 @@
                 daysInput.attr("name", "days[" + priceId + "]");
                 var currencyInput = clone.find('.currency select');
                 currencyInput.attr("name", "currency_id[" + priceId + "]");
+                var speciesInput = clone.find('.species select');
+                speciesInput.attr("name", "species_id[" + priceId + "]");
             });
 
             function attachRemoveListener(node) {

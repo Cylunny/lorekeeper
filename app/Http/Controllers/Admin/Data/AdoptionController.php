@@ -11,6 +11,7 @@ use App\Models\Adoption\Adoption;
 use App\Models\Adoption\AdoptionStock;
 use App\Models\Character\Character;
 use App\Models\Currency\Currency;
+use App\Models\Species\Species;
 use App\Models\User\User;
 
 use App\Services\AdoptionService;
@@ -103,6 +104,7 @@ class AdoptionController extends Controller
             'adoption' => $adoption,
             'characters' => Character::orderBy('id')->get()->where('user_id', intval(Settings::get('adopts_user')))->pluck('fullname', 'id'),
             'currencies' => Currency::orderBy('name')->pluck('name', 'id'),
+            'specieses' => Species::orderBy('name')->pluck('name', 'id'),
         ]);
     }
 
@@ -118,7 +120,7 @@ class AdoptionController extends Controller
     {
         $id ? $request->validate(Adoption::$updateRules) : $request->validate(Adoption::$createRules);
         $data = $request->only([
-            'name', 'description', 'image', 'remove_image', 'is_active', 'days', 'currency_id', 'prices'
+            'name', 'description', 'image', 'remove_image', 'is_active', 'days', 'currency_id', 'prices', 'species_id'
         ]);
         if($id && $service->updateAdoption(Adoption::find($id), $data, Auth::user())) {
             flash('Adoption updated successfully.')->success();

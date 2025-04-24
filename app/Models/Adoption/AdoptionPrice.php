@@ -13,7 +13,7 @@ class AdoptionPrice extends Model
      * @var array
      */
     protected $fillable = [
-        'adoption_id', 'currency_id', 'days', 'amount'
+        'adoption_id', 'currency_id', 'days', 'amount', 'species_id'
     ];
 
     /**
@@ -30,15 +30,24 @@ class AdoptionPrice extends Model
     **********************************************************************************************/
     
     /**
-     * Get the character being stocked.
+     * Get the currency to change to.
      */
     public function currency() 
     {
         return $this->belongsTo('App\Models\Currency\Currency');
     }
+
+    /**
+     * Get the species this price applies to.
+     */
+    public function species() 
+    {
+        return $this->belongsTo('App\Models\Species\Species');
+    }
+    
     
     /**
-     * Get the adoption that holds this character.
+     * Get the adoption that holds this price.
      */
     public function adoption() 
     {
